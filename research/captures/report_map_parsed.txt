@@ -1,0 +1,61 @@
+=== /dev/hidraw14 ===
+  report_id=0x24 ( 36)  type=Input    size= 464 bits = 58 bytes
+  report_id=0x23 ( 35)  type=Input    size= 232 bits = 29 bytes
+  report_id=0x26 ( 38)  type=Input    size=   8 bits = 1 bytes
+  report_id=0x01 (  1)  type=Feature  size=  16 bits = 2 bytes
+  report_id=0x02 (  2)  type=Feature  size= 264 bits = 33 bytes
+  report_id=0xff (255)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x03 (  3)  type=Feature  size= 368 bits = 46 bytes
+  report_id=0x05 (  5)  type=Feature  size= 416 bits = 52 bytes
+  report_id=0x0b ( 11)  type=Feature  size=  24 bits = 3 bytes
+  report_id=0x0a ( 10)  type=Feature  size=  24 bits = 3 bytes
+  report_id=0x01 (  1)  type=Output   size= 504 bits = 63 bytes
+  report_id=0x10 ( 16)  type=Feature  size=  16 bits = 2 bytes
+  report_id=0x11 ( 17)  type=Feature  size= 504 bits = 63 bytes
+
+=== /dev/hidraw16 ===
+  report_id=0x24 ( 36)  type=Input    size= 464 bits = 58 bytes
+  report_id=0x23 ( 35)  type=Input    size= 232 bits = 29 bytes
+  report_id=0x26 ( 38)  type=Input    size=   8 bits = 1 bytes
+  report_id=0x01 (  1)  type=Feature  size=  16 bits = 2 bytes
+  report_id=0x02 (  2)  type=Feature  size= 264 bits = 33 bytes
+  report_id=0xff (255)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x03 (  3)  type=Feature  size= 368 bits = 46 bytes
+  report_id=0x05 (  5)  type=Feature  size= 416 bits = 52 bytes
+  report_id=0x0b ( 11)  type=Feature  size=  24 bits = 3 bytes
+  report_id=0x0a ( 10)  type=Feature  size=  24 bits = 3 bytes
+  report_id=0x01 (  1)  type=Output   size= 504 bits = 63 bytes
+  report_id=0x10 ( 16)  type=Feature  size=  16 bits = 2 bytes
+  report_id=0x11 ( 17)  type=Feature  size= 504 bits = 63 bytes
+
+=== /dev/hidraw19 ===
+  report_id=0x20 ( 32)  type=Input    size= 408 bits = 51 bytes
+  report_id=0x01 (  1)  type=Feature  size=  16 bits = 2 bytes
+  report_id=0x03 (  3)  type=Feature  size= 368 bits = 46 bytes
+  report_id=0x04 (  4)  type=Feature  size=  32 bits = 4 bytes
+  report_id=0x07 (  7)  type=Feature  size=  32 bits = 4 bytes
+  report_id=0x05 (  5)  type=Feature  size= 416 bits = 52 bytes
+  report_id=0x08 (  8)  type=Feature  size=  64 bits = 8 bytes
+  report_id=0x09 (  9)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x06 (  6)  type=Feature  size=   8 bits = 1 bytes
+  report_id=0x0c ( 12)  type=Feature  size=   8 bits = 1 bytes
+  report_id=0x0d ( 13)  type=Feature  size=   8 bits = 1 bytes
+  report_id=0x13 ( 19)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x15 ( 21)  type=Feature  size= 496 bits = 62 bytes
+  report_id=0x01 (  1)  type=Output   size= 504 bits = 63 bytes
+  report_id=0x10 ( 16)  type=Feature  size=  16 bits = 2 bytes
+  report_id=0x11 ( 17)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x12 ( 18)  type=Feature  size=   8 bits = 1 bytes
+  report_id=0x16 ( 22)  type=Feature  size=   8 bits = 1 bytes
+  report_id=0x20 ( 32)  type=Feature  size= 512 bits = 64 bytes
+  report_id=0x21 ( 33)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x22 ( 34)  type=Feature  size= 504 bits = 63 bytes
+  report_id=0x24 ( 36)  type=Feature  size= 488 bits = 61 bytes
+
+=== /dev/hidraw20 ===
+  report_id=0x21 ( 33)  type=Input    size= 456 bits = 57 bytes
+  report_id=0x25 ( 37)  type=Input    size= 504 bits = 63 bytes
+  report_id=0x27 ( 39)  type=Input    size= 464 bits = 58 bytes
+  report_id=0x28 ( 40)  type=Input    size= 504 bits = 63 bytes
+
+=== /dev/hidraw21 ===

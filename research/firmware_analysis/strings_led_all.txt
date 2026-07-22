@@ -1,0 +1,70 @@
+ASSERT FAILED: File:%s Line:%i
+BM disabled
+ BM: get avail. mA failed (rval=%u)
+bq2429x: failed to get oconfig (%d)
+bq2429x: failed to set oconfig disable (%d)
+BTN: failed to queue event
+Commands are called in the form: "cmd <param1> <param2> ... "
+[crq] Device %i failed to start!
+DFU: Bad state. firmware_update_start() not called?
+disabled
+ enabled
+failed!
+ Failed to disable OTG (%d)
+ Failed to enable OTG (%d)
+Failed to send status
+*** FAILED TO SHUTDOWN ***
+FPGA: read reg failed; defaulting to PayloadFlags FPGA protocol
+FPGA: SPI byte swap %senabled
+IMU: WOM disabled
+IMU: WOM enabled
+Invalid LED ID %u
+led
+LED brightness = %d%% -- %d.%d mA
+ led.c
+led.c
+ led_color_blue
+led_color_green
+led_color_orange
+led_color_red
+led_color_white
+led_driver_brightness_b
+led_driver_brightness_g
+led_driver_brightness_r
+led_driver_brightness_w
+led_driver_current_b
+led_driver_current_g
+ led_driver_current_r
+led_driver_current_r
+led_driver_current_w
+ led_driver_gpio.c
+ led_driver_lp5562.c
+led_driver_lp5562.c
+ LED: lp5562 led error
+led_policy_knuckles.c
+LED %u: color = 0x%06X->0x%06X, status: %u, blink_on = %s
+LEP: enabled:       0x%08x
+ [msg] flow control disabled
+ [msg] flow control enabled
+RF: Enter DTM failed: 0x%x
+ RF: failed to recv: %d, %d
+RF: failed to send: %d %d %d (%d retries)
+%sdisabled
+%s: FAILED TO NOTIFY LISTENER
+%sFailed to send DTM start
+ [sob] base search cancelled
+SOB shell disabled
+SPI shell disabled
+SS: sensor scheduling is disabled
+SS: sensor scheduling is enabled
+SS: sensor scheduling is enabled in test mode
+ SS-TDM: TDM schedule is stalled
+ SS-TDM: TDM scheduling disabled
+ SS-TDM: TDM scheduling enabled
+trackpad_enabled = %d
+ trick modes disabled
+trigger_enabled  = %d
+[twi] twi_manager_read Failed PID: %02x [dv %02x] to _twi_wait_for_transfer_complete
+[twi] xSemaphoreGiveFromISR() failed; msg lost
+ [vrc] Error! Failed to queue msg: %x %x
+WISCEBridge is disabled

@@ -1,0 +1,45 @@
+MIT License
+
+Copyright (c) 2026 Project Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Scope of this license
+
+This license applies ONLY to original work produced during this project:
+documentation (the `docs/`, `research/` trees and this README), analysis
+scripts and tools (`scripts/`, `tools/`), patch-generation code (`patches/`),
+and any diagrams or notes authored by project contributors.
+
+This license does **not** apply to, and does not grant any rights over:
+
+- Valve Corporation's SteamVR software, the `lighthouse_watchman_update` tool,
+  or any other Valve-authored binary referenced by this repository.
+- Valve Index Controller firmware images (`.fw` files), their decompressed
+  contents, or any derivative firmware image (patched or otherwise) built
+  from them.
+- Any strings, symbol names, function structure, or other content extracted
+  from Valve's firmware and reproduced in this documentation for research/
+  analysis purposes. Such excerpts are included under fair-use principles
+  for the purpose of technical criticism, interoperability research, and
+  security research, and remain the property of Valve Corporation.
+
+See `docs/17_safety.md` and the Legal Notice in the README for full detail.

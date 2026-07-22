@@ -1,0 +1,27 @@
+>>> set_gpio_level
+set_gpio_level
+0:33:46.853 Argument Input error
+0:33:46.853 Args:
+ <addr> (eg PA21)
+ <level> (high/low or h/l)
+
+# 
+====================
+>>> get_gpio_level
+get_gpio_level
+0:33:48.420 Argument Input error
+0:33:48.421 Args:
+ <addr> (eg PA21)
+
+# 
+====================
+>>> info
+info
+0:33:49.987 S/N: LHR-80E7752A
+0:33:49.987 HWID: 0x110e0009 (Index Controller)
+0:33:49.988 App ver: 0x64f2df77 1693638519 / 2023-09-02 00:08:39 git: 2c3286c3
+0:33:49.989 Radio ver: 0x5d27b2a9 1562882729
+0:33:49.989 FPGA ver: 0x21a 538
+
+# 
+====================

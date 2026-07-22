@@ -1,0 +1,22 @@
+=== report 0x06: SET to 0x01 ===
+  ioctl OK. WATCH THE CONTROLLER LED NOW.
+=== report 0x06: SET back to 0x00 ===
+  ioctl OK (reverted).
+
+=== report 0x0c: SET to 0x01 ===
+  ioctl OK. WATCH THE CONTROLLER LED NOW.
+=== report 0x0c: SET back to 0x00 ===
+  ioctl OK (reverted).
+
+=== report 0x0d: SET to 0x01 ===
+  ioctl OK. WATCH THE CONTROLLER LED NOW.
+=== report 0x0d: SET back to 0x00 ===
+  ioctl OK (reverted).
+
+=== report 0x12: SET to 0x01 ===
+  ioctl OK. WATCH THE CONTROLLER LED NOW.
+=== report 0x12: SET back to 0x00 ===
+  ioctl FAILED errno=19 (No such device)
+
+=== report 0x16: SET to 0x01 ===
+  ioctl FAILED errno=19 (No such device)

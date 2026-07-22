@@ -1,0 +1,74 @@
+=== user_flash ===
+>>> user_flash
+user_flash
+
+# 
+
+=== user_flash help ===
+>>> user_flash help
+user_flash help
+
+# 
+
+=== user_data ===
+>>> user_data
+user_data
+user_data header       header information
+user_data entry <name> information on the named entry
+user_data all          information the header and all entries
+
+# 
+
+=== user_data help ===
+>>> user_data help
+user_data help
+User data init: 9
+
+# 
+
+=== flash_info ===
+>>> flash_info
+flash_info
+9:52:27.229 
+--- 6 code regions ---
+9:52:27.229 0x00412000 - 0x00441f64   196452 bytes RO code + data
+9:52:27.229 0x20002000 - 0x20003878     6264 bytes RW
+9:52:27.231 0x20003878 - 0x200256cc   138836 bytes ZI
+9:52:27.232 0x200256cc - 0x20025740      116 bytes RAMFUNCS
+9:52:27.233 0x20025740 - 0x20027c00     9408 bytes free RAM
+9:52:27.236 0x20027c00 - 0x20028000     1024 bytes main() stack
+9:52:27.237 [   bootloader ]: 0x00000000 - 0x00011fff ( 53048 of  73728 bytes used) CRC: 0x7f421c1b v1
+9:52:27.242 [  ice40_image ]: 0x00044000 - 0x00057fff ( 78219 of  81920 bytes used) CRC: 0x0ea4139c v1
+9:52:27.247 [  application ]: 0x00012000 - 0x00043fff (197940 of 204800 bytes used) CRC: 0x40006924 v1
+9:52:27.250 [   data_store ]: 0x0007a000 - 0x0007bfff (  8184 of   8192 bytes used) CRC: 0x29474b95 v1
+9:52:27.253 [  stored_conf ]: 0x0007c000 - 0x0007dfff (  1702 of   8192 bytes used) CRC: 0x00000000 v1
+9:52:27.256 [  descriptors ]: 0x0007e000 - 0x0007ffff (   360 of   8192 bytes used) CRC: 0x00000000 v1
+9:52:27.258 [  hardware_id ]: 0xc0ffeeee - 0xc0fff0ed (     0 of    512 bytes used) CRC: 0x00000000 v1
+9:52:27.261 [   scratchpad ]: 0x00058000 - 0x00079fff (     0 of 139264 bytes used) CRC: 0x00000000 v1
+9:52:27.265 [     reserved ]: 0x0007a000 - 0x00079fff (     0 of      0 bytes used) CRC: 0x00000000 v1
+
+# 
+
+=== flash_info help ===
+>>> flash_info help
+flash_info help
+9:52:28.353 
+--- 6 code regions ---
+9:52:28.354 0x00412000 - 0x00441f64   196452 bytes RO code + data
+9:52:28.354 0x20002000 - 0x20003878     6264 bytes RW
+9:52:28.354 0x20003878 - 0x200256cc   138836 bytes ZI
+9:52:28.356 0x200256cc - 0x20025740      116 bytes RAMFUNCS
+9:52:28.357 0x20025740 - 0x20027c00     9408 bytes free RAM
+9:52:28.361 0x20027c00 - 0x20028000     1024 bytes main() stack
+9:52:28.362 [   bootloader ]: 0x00000000 - 0x00011fff ( 53048 of  73728 bytes used) CRC: 0x7f421c1b v1
+9:52:28.363 [  ice40_image ]: 0x00044000 - 0x00057fff ( 78219 of  81920 bytes used) CRC: 0x0ea4139c v1
+9:52:28.369 [  application ]: 0x00012000 - 0x00043fff (197940 of 204800 bytes used) CRC: 0x40006924 v1
+9:52:28.370 [   data_store ]: 0x0007a000 - 0x0007bfff (  8184 of   8192 bytes used) CRC: 0x29474b95 v1
+9:52:28.372 [  stored_conf ]: 0x0007c000 - 0x0007dfff (  1702 of   8192 bytes used) CRC: 0x00000000 v1
+9:52:28.378 [  descriptors ]: 0x0007e000 - 0x0007ffff (   360 of   8192 bytes used) CRC: 0x00000000 v1
+9:52:28.381 [  hardware_id ]: 0xc0ffeeee - 0xc0fff0ed (     0 of    512 bytes used) CRC: 0x00000000 v1
+9:52:28.386 [   scratchpad ]: 0x00058000 - 0x00079fff (     0 of 139264 bytes used) CRC: 0x00000000 v1
+9:52:28.389 [     reserved ]: 0x0007a000 - 0x00079fff (     0 of      0 bytes used) CRC: 0x00000000 v1
+
+# 
+

@@ -1,0 +1,43 @@
+# Firmware hash manifest
+#
+# These hashes identify the exact Valve firmware files this repository's
+# documentation refers to. Valve firmware binaries are NOT included in this
+# repository — see docs/04_firmware_acquisition.md for how to obtain them
+# from your own legitimate SteamVR installation, and the top-level README
+# for the legal notice covering Valve-owned content.
+#
+# SteamVR build ID at time of capture: 23791826
+# Firmware source path within SteamVR install:
+#   drivers/indexcontroller/resources/firmware/indexcontroller/
+#
+# Format: <sha256>  <filename>  <size-bytes>  <notes>
+
+## As shipped by SteamVR (raw .fw files, zlib-compressed except the two radio builds)
+
+f515899b876aa5277855b0ce943f704b2bd97728e146d446bfd8ccf09c26316e  indexcontroller_app_20190621_v1561139887.fw  137982  application firmware, 2019-06-21
+cc2b206538b30567f3c9b3ca8f0e67c947a5366420f49d6f10adaa5c01d0740c  indexcontroller_app_20190712_v1562916277.fw  138107  application firmware, 2019-07-12
+ed5b7a3d2763a894a995a6bfad3cbdae7eb0b7cc506c3b41b30487afce90d1f0  indexcontroller_app_20230902_v1693638519.fw  138645  application firmware, 2023-09-02, git 2c3286c3 -- PRIMARY ANALYSIS TARGET for this repository
+8b66f0b09efb081f545779f14cf0bc0db5c0f2bcaa83da1978de643fb0161e3f  indexcontroller_app_ev_20231013_v1697193759.fw  139185  application firmware, "ev" variant, 2023-10-13
+281a2a5c702fae250fdaf6adc6a2bb5bf806c02522f2e237218f41cffbe275c9  indexcontroller_fpga_2_26.fw  78219  FPGA bitstream, version 2.26
+446abb87659caff20f126c8012d0aae06012ba90dba1189e230a41cb5e0e7a3f  indexcontroller_radio_20190612_v1560372213.fw  34756  radio firmware, 2019-06-12 -- NOT zlib-compressed, not analyzed in this project
+b3b7e07e5e82eede3f5bbb10c8cf655d4d0928a9a3b63e519579d0b26a10cc67  indexcontroller_radio_20190711_v1562882729.fw  34844  radio firmware, 2019-07-11 -- NOT zlib-compressed, not analyzed in this project
+
+## Decompressed application/FPGA images (derived from the files above via zlib.decompress())
+## Reproduce with: docs/04_firmware_acquisition.md "Extracting" snippet
+
+fd03c554491fabddead71a6bae7f898b05ee50d05cd3d031665dcf2498647549  indexcontroller_app_20190621_v1561139887.fw.decompressed.bin
+fa4066e077660242118e428d8aa77fb595d7e09675810064ddd21c2b84c1414b  indexcontroller_app_20190712_v1562916277.fw.decompressed.bin
+b109ff5a51a77d432d3b21e13310b033a22be952d14ddc2732fc01e3bf2cbde3  indexcontroller_app_20230902_v1693638519.fw.decompressed.bin  197940 bytes -- PRIMARY ANALYSIS TARGET, all file offsets in docs/06_firmware_symbols.md refer to this exact file
+64f52e8ed16c46207dffadbde68835b5e9e3271b450c6912898bf5a2bb4db87f  indexcontroller_app_ev_20231013_v1697193759.fw.decompressed.bin
+01ee3e2cd774a79e0610f6c962ceefb315b1ff507e0d44c160cbaeb375a4a93f  indexcontroller_fpga_2_26.fw.decompressed.bin
+
+## Patched firmware images built during this project (derived, NOT redistributed --
+## rebuild with the scripts in patches/ and scripts/, verify against these hashes)
+
+c3abc668c9ef2481f772d2d55227f709c82cad30f8b33bda831312ae42c52233  indexcontroller_app_LEDTEST_v255.fw  patch A, led_driver_current_*=255 (scripts/patch_led_firmware.py 255) -- built from the 20230902 base
+1bc5f8a999b7e6e1cec93f1fecc8aae0c849e6540096d89c5bb64c2f6970f8cc  indexcontroller_app_LEDTEST_v0.fw    patch A, led_driver_current_*=0   (scripts/patch_led_firmware.py 0)
+e3800372d74a2afc3a5ff034f0472e5336f4ae5212eea221048253e940a27af3  indexcontroller_app_LEDBLACK.fw      patch B, forced-black code patch  (scripts/patch_led_black.py) -- the primary proven positive-result patch, docs/13_experiments.md Experiment 7
+
+7328addf5745fe68a28e120eaa8134f065ad9a602d26f039eed0afc12588ffc4  indexcontroller_app_LEDTEST_v255.decompressed.bin
+e33aea641e72cff911075e62edebdbed3aae65c3a34c11116f71caf0e56ededd  indexcontroller_app_LEDTEST_v0.decompressed.bin
+2ee59c7fc226a38dd519f80a683b15392d5f3ae7474cd6808cede8a53f67b7b5  indexcontroller_app_LEDBLACK.decompressed.bin

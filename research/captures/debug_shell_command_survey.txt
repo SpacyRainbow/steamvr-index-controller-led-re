@@ -1,0 +1,180 @@
+>>> haptics
+haptics
+
+# 
+====================
+>>> power
+power
+0:34:55.977 power <cmd> [params]:
+	get
+	set <level>
+
+# 
+====================
+>>> config
+config
+0:34:57.443 Config: 1508 of 3072 bytes
+0:34:57.444   0: vrc                             	(0x7e589aed) = 0:34:57.444 TRUE
+0:34:57.444   1: radio                           	(0x6e24e5b7) = 0:34:57.445 TRUE
+0:34:57.445   2: charge_voltage_limit_mv         	(0xb7bcb271) = 0:34:57.448 4320 (0x000010e0)
+0:34:57.449   3: charge_current_ma               	(0x1fd4f7f6) = 0:34:57.451 896 (0x00000380)
+0:34:57.451   4: charging_low_temp_threshold_c   	(0x58673003) = 0:34:57.453 15 (0x0000000f)
+0:34:57.455   5: charge_current_low_temp_ma      	(0xa764b3af) = 0:34:57.457 220 (0x000000dc)
+0:34:57.457   6: charging_high_temp_threshold_c  	(0x827ef8c2) = 0:34:57.460 38 (0x00000026)
+0:34:57.461   7: charge_current_high_temp_ma     	(0xfffc764c) = 0:34:57.463 220 (0x000000dc)
+0:34:57.465   8: bq27421_design_capacity         	(0x57861228) = 0:34:57.466 1100 (0x0000044c)
+0:34:57.468   9: bq27421_design_energy           	(0xd572d6e7) = 0:34:57.471 4180 (0x00001054)
+0:34:57.471  10: bq27421_terminate_voltage       	(0x39b6a631) = 0:34:57.473 3300 (0x00000ce4)
+0:34:57.474  11: bq27421_taper_rate              	(0x3d1b8905) = 0:34:57.477 71 (0x00000047)
+0:34:57.477  12: trigger                         	(0xc3afd061) = 0:34:57.479 TRUE
+0:34:57.480  13: trigger_field_min               	(0x5ef100fe) = 0:34:57.481 400 (0x00000190)
+0:34:57.482  14: trigger_field_max               	(0x0ca7656c) = 0:34:57.485 700 (0x000002bc)
+0:34:57.487  15: thumbstick                      	(0xfbe90799) = 0:34:57.488 TRUE
+0:34:57.489  16: thumbstick_center_x             	(0xd7461282) = 0:34:57.491 2050 (0x00000802)
+0:34:57.491  17: thumbstick_min_x                	(0xf52ebe4b) = 0:34:57.496 1350 (0x00000546)
+0:34:57.496  18: thumbstick_max_x                	(0x0958222a) = 0:34:57.497 2750 (0x00000abe)
+0:34:57.498  19: thumbstick_center_y             	(0xe9a3b73d) = 0:34:57.499 2050 (0x00000802)
+0:34:57.500  20: thumbstick_min_y                	(0xc69e611f) = 0:34:57.504 1350 (0x00000546)
+0:34:57.505  21: thumbstick_max_y                	(0x1b92c69f) = 0:34:57.505 2750 (0x00000abe)
+0:34:57.506  22: thumbstick_deadzone_raw         	(0x275d0788) = 0:34:57.507 350 (0x0000015e)
+0:34:57.508  23: haptics                         	(0x1e3147ce) = 0:34:57.512 TRUE
+0:34:57.512  24: fsr                             	(0x5efaf509) = 0:34:57.513 TRUE
+0:34:57.513  25: power_on_button_press_ms        	(0x9e68480d) = 0:34:57.514 400 (0x00000190)
+0:34:57.515  26: led_driver_current_r            	(0x7765723d) = 0:34:57.516 8 (0x00000008)
+0:34:57.517  27: led_driver_current_g            	(0xd9e4b742) = 0:34:57.521 8 (0x00000008)
+0:34:57.521  28: led_driver_current_b            	(0x233149da) = 0:34:57.522 8 (0x00000008)
+0:34:57.522  29: led_driver_current_w            	(0xfdd37f1b) = 0:34:57.524 8 (0x00000008)
+0:34:57.524  30: product_name                    	(0x2886e0bf) = 0:34:57.528 "Index Controller"
+0:34:57.529  31: finger_type                     	(0x0103cdaf) = 0:34:57.531 11 (0x0000000b)
+0:34:57.531  32: sensor_enable                   	(0xa381c898) = 0:34:57.533 66846654 (0x03fbffbe)
+0:34:57.537  33: sensor_env_on_pin_a             	(0xe6f55465) = 0:34:57.538 147456 (0x00024000)
+0:34:57.538  34: trackpad                        	(0x2abb4b15) = 0:34:57.538 8 (0x00000008)
+0:34:57.539  35: thumbstick_flip_x               	(0x7e743f00) = 0:34:57.541 1 (0x00000001)
+0:34:57.541  36: thumbstick_flip_y               	(0xbf22c060) = 0:34:57.545 1 (0x00000001)
+0:34:57.546  37: fsr_grip_A                      	(0x37c34df1) = 0:34:57.546 -0.255
+0:34:57.546  38: fsr_grip_B                      	(0x40e1602d) = 0:34:57.547 0.92
+0:34:57.548  39: fsr_grip_C                      	(0x534a04fe) = 0:34:57.550 0.2772
+0:34:57.550  40: fsr_grip_D                      	(0x7e515b0c) = 0:34:57.555 1.253725
+0:34:57.556  41: fsr_thumb_A                     	(0xad1f662d) = 0:34:57.557 -0.245
+0:34:57.558  42: fsr_thumb_B                     	(0x9b60c2b0) = 0:34:57.562 0.91
+0:34:57.562  43: fsr_thumb_C                     	(0x4a55a09b) = 0:34:57.562 0.269199
+0:34:57.562  44: fsr_thumb_D                     	(0x78a4fd39) = 0:34:57.564 1.132344
+0:34:57.564  45: debug                           	(0x0addd94c) = 0:34:57.566 1 (0x00000001)
+
+# 
+====================
+>>> battery
+battery
+0:34:59.101 vbus:
+0:34:59.101 	state:              host
+0:34:59.102 usb:
+0:34:59.102 	enumerated:         yes
+0:34:59.102 	power good:         yes
+0:34:59.102 	input cur limit:    500 mA
+0:34:59.104 battery:
+0:34:59.105 	detected:           yes
+0:34:59.106 	in termination:     no
+0:34:59.107 	state of charge:    34 %
+0:34:59.108 	voltage:            4068 mV
+0:34:59.109 	average current:    371 mA
+0:34:59.110 	capacity remaining: 247 mAh
+0:34:59.112 fuel gauge:
+0:34:59.115 	external temp:      36.3 C
+0:34:59.115 	internal temp:      36.4 C
+0:34:59.116 	flags:              0x0188
+0:34:59.116 	control status:     0x038a
+0:34:59.118 	cycle_count:        0x0
+0:34:59.118 charger:
+0:34:59.118 	connected:          yes
+0:34:59.118 	state:              fast charging
+0:34:59.121 Fuel gauge: bq27421
+0:34:59.124 DM Code:    97 (0x0061)
+
+# 
+====================
+>>> watchman
+watchman
+watchman [resume | suspend]
+
+# 
+====================
+>>> controller
+controller
+0:35:02.074 VRC:
+0:35:02.074 suspended        = 0
+0:35:02.075 trackpad_enabled = 1
+0:35:02.075 trigger_enabled  = 1
+0:35:02.075 trigger          = 0
+0:35:02.075 trigger analog   = 1816
+0:35:02.076 buttons          = 0x2
+0:35:02.077 fsr top analog   = 2547
+0:35:02.078 fsr grip analog  = 3657
+0:35:02.081 trackpad: 20702, -32768 10558 (0)
+0:35:02.082 fingers: 0, 0 0 0
+0:35:02.082 thumbstick: 2062, 2013
+# 
+====================
+>>> route
+route
+0:35:03.552 MSG route: USB
+
+# 
+====================
+>>> queue
+queue
+
+# 
+====================
+>>> lep
+lep
+0:35:06.485 LEP: running
+0:35:06.485 
+0:35:06.485 missing_rising_edge = 0
+0:35:06.486 pulse_queue_overflow = 0
+0:35:06.486 events queue high water mark = 128
+0:35:06.486 dropped LEP_INVALID events = 3
+0:35:06.487 dropped LEP_CO_SYNC events = 0
+0:35:06.489 dropped LEP_DEFAULT events = 1664874
+0:35:06.490 dropped LEP_SYNC events = 0
+0:35:06.490 dropped LEP_AUX events = 0
+0:35:06.492 dropped LEP_IMPORTANT events = 0
+0:35:06.494 
+
+# 
+====================
+>>> schedule
+schedule
+0:35:07.968 schedule
+schedule disable
+schedule enable
+schedule test
+schedule apply <seconds> <32b sensor mask, base16>
+
+# 
+====================
+>>> tasks
+tasks
+
+--- 35:9 - 12 tasks ---
+R id: 12 pri:  6 stack free:  228 time:   1% shell
+R id:  3 pri:  0 stack free:  200 time:  57% IDLE
+B id:  8 pri: 12 stack free: 1040 time:   3% sync on beam
+B id:  2 pri: 12 stack free:  600 time:  14% watchman
+B id: 11 pri: 11 stack free:  696 time:  22% vrc
+B id:  9 pri:  3 stack free:  720 time:   1% sync on beam bg
+B id:  1 pri:  7 stack free:   92 time:   1% wdt
+B id:  4 pri: 14 stack free:  504 time:   3% Tmr Svc
+S id:  7 pri:  9 stack free:  944 time:   1% battery
+S id: 10 pri: 14 stack free:  440 time:   3% imu
+S id:  6 pri: 13 stack free:  292 time:   2% fpga
+S id:  5 pri:  8 stack free:  304 time:   1% power
+0% busy
+
+# 
+====================
+>>> imu
+imu
+0:35:10.931 IMU: 0:35:10.931 running 250 Hz  2000 dps  8 G0:35:10.931 
+
+# 
+====================

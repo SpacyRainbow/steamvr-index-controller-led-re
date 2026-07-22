@@ -1,0 +1,51 @@
+>>> config set led_driver_current_r 20
+config set led_driver_current_r 20
+0:37:06.732 Config: 1508 of 3072 bytes
+0:37:06.733   0: vrc                             	(0x7e589aed) = 0:37:06.735 TRUE
+0:37:06.735   1: radio                           	(0x6e24e5b7) = 0:37:06.737 TRUE
+0:37:06.737   2: charge_voltage_limit_mv         	(0xb7bcb271) = 0:37:06.737 4320 (0x000010e0)
+0:37:06.737   3: charge_current_ma               	(0x1fd4f7f6) = 0:37:06.739 896 (0x00000380)
+0:37:06.740   4: charging_low_temp_threshold_c   	(0x58673003) = 0:37:06.745 15 (0x0000000f)
+0:37:06.745   5: charge_current_low_temp_ma      	(0xa764b3af) = 0:37:06.746 220 (0x000000dc)
+0:37:06.747   6: charging_high_temp_threshold_c  	(0x827ef8c2) = 0:37:06.749 38 (0x00000026)
+0:37:06.753   7: charge_current_high_temp_ma     	(0xfffc764c) = 0:37:06.754 220 (0x000000dc)
+0:37:06.755   8: bq27421_design_capacity         	(0x57861228) = 0:37:06.757 1100 (0x0000044c)
+0:37:06.761   9: bq27421_design_energy           	(0xd572d6e7) = 0:37:06.761 4180 (0x00001054)
+0:37:06.761  10: bq27421_terminate_voltage       	(0x39b6a631) = 0:37:06.762 3300 (0x00000ce4)
+0:37:06.763  11: bq27421_taper_rate              	(0x3d1b8905) = 0:37:06.765 71 (0x00000047)
+0:37:06.765  12: trigger                         	(0xc3afd061) = 0:37:06.769 TRUE
+0:37:06.769  13: trigger_field_min               	(0x5ef100fe) = 0:37:06.770 400 (0x00000190)
+0:37:06.770  14: trigger_field_max               	(0x0ca7656c) = 0:37:06.772 700 (0x000002bc)
+0:37:06.773  15: thumbstick                      	(0xfbe90799) = 0:37:06.777 TRUE
+0:37:06.778  16: thumbstick_center_x             	(0xd7461282) = 0:37:06.779 2050 (0x00000802)
+0:37:06.780  17: thumbstick_min_x                	(0xf52ebe4b) = 0:37:06.783 1350 (0x00000546)
+0:37:06.785  18: thumbstick_max_x                	(0x0958222a) = 0:37:06.787 2750 (0x00000abe)
+0:37:06.787  19: thumbstick_center_y             	(0xe9a3b73d) = 0:37:06.789 2050 (0x00000802)
+0:37:06.791  20: thumbstick_min_y                	(0xc69e611f) = 0:37:06.794 1350 (0x00000546)
+0:37:06.795  21: thumbstick_max_y                	(0x1b92c69f) = 0:37:06.796 2750 (0x00000abe)
+0:37:06.797  22: thumbstick_deadzone_raw         	(0x275d0788) = 0:37:06.801 350 (0x0000015e)
+0:37:06.802  23: haptics                         	(0x1e3147ce) = 0:37:06.802 TRUE
+0:37:06.802  24: fsr                             	(0x5efaf509) = 0:37:06.803 TRUE
+0:37:06.804  25: power_on_button_press_ms        	(0x9e68480d) = 0:37:06.805 400 (0x00000190)
+0:37:06.808  26: led_driver_current_r            	(0x7765723d) = 0:37:06.810 8 (0x00000008)
+0:37:06.810  27: led_driver_current_g            	(0xd9e4b742) = 0:37:06.812 8 (0x00000008)
+0:37:06.813  28: led_driver_current_b            	(0x233149da) = 0:37:06.815 8 (0x00000008)
+0:37:06.816  29: led_driver_current_w            	(0xfdd37f1b) = 0:37:06.818 8 (0x00000008)
+0:37:06.819  30: product_name                    	(0x2886e0bf) = 0:37:06.820 "Index Controller"
+0:37:06.820  31: finger_type                     	(0x0103cdaf) = 0:37:06.824 11 (0x0000000b)
+0:37:06.824  32: sensor_enable                   	(0xa381c898) = 0:37:06.825 66846654 (0x03fbffbe)
+0:37:06.827  33: sensor_env_on_pin_a             	(0xe6f55465) = 0:37:06.828 147456 (0x00024000)
+0:37:06.828  34: trackpad                        	(0x2abb4b15) = 0:37:06.832 8 (0x00000008)
+0:37:06.833  35: thumbstick_flip_x               	(0x7e743f00) = 0:37:06.835 1 (0x00000001)
+0:37:06.836  36: thumbstick_flip_y               	(0xbf22c060) = 0:37:06.839 1 (0x00000001)
+0:37:06.840  37: fsr_grip_A                      	(0x37c34df1) = 0:37:06.843 -0.255
+0:37:06.843  38: fsr_grip_B                      	(0x40e1602d) = 0:37:06.844 0.92
+0:37:06.845  39: fsr_grip_C                      	(0x534a04fe) = 0:37:06.848 0.2772
+0:37:06.848  40: fsr_grip_D                      	(0x7e515b0c) = 0:37:06.850 1.253725
+0:37:06.852  41: fsr_thumb_A                     	(0xad1f662d) = 0:37:06.853 -0.245
+0:37:06.856  42: fsr_thumb_B                     	(0x9b60c2b0) = 0:37:06.857 0.91
+0:37:06.857  43: fsr_thumb_C                     	(0x4a55a09b) = 0:37:06.859 0.269199
+0:37:06.860  44: fsr_thumb_D                     	(0x78a4fd39) = 0:37:06.861 1.132344
+0:37:06.861  45: debug                           	(0x0addd94c) = 0:37:06.864 1 (0x00000001)
+
+# 

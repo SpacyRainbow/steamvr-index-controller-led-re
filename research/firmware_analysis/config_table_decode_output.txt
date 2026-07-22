@@ -1,0 +1,47 @@
+idx name                             flag       addr   file_off    value_i32      value_f32                 live match
+  0 vrc                              0x01 0x00441690 0x0002c594            1       0.000000                 TRUE 
+  1 radio                            0x01 0x00441568 0x0002c59d            1       0.000000                 TRUE 
+  2 charge_voltage_limit_mv          0x07 0x00441768 0x0002c5a6         4320       0.000000                 4320 OK(int)
+  3 charge_current_ma                0x07 0x00441624 0x0002c5af          896       0.000000                  896 OK(int)
+  4 charging_low_temp_threshold_c    0x07 0x00441670 0x0002c5b8           15       0.000000                   15 OK(int)
+  5 charge_current_low_temp_ma       0x07 0x00441608 0x0002c5c1          220       0.000000                  220 OK(int)
+  6 charging_high_temp_threshold_c   0x07 0x00441650 0x0002c5ca           38       0.000000                   38 OK(int)
+  7 charge_current_high_temp_ma      0x07 0x004415ec 0x0002c5d3          220       0.000000                  220 OK(int)
+  8 bq27421_design_capacity          0x08 0x00441854 0x0002c5dc         1100       0.000000                 1100 OK(int)
+  9 bq27421_design_energy            0x08 0x0044183c 0x0002c5e5         4180       0.000000                 4180 OK(int)
+ 10 bq27421_terminate_voltage        0x08 0x00441694 0x0002c5ee         3300       0.000000                 3300 OK(int)
+ 11 bq27421_taper_rate               0x08 0x004416c0 0x0002c5f7           71       0.000000                   71 OK(int)
+ 12 trigger                          0x01 0x00441724 0x0002c600            1       0.000000                 TRUE 
+ 13 trigger_field_min                0x07 0x004416f8 0x0002c609          400       0.000000                  400 OK(int)
+ 14 trigger_field_max                0x07 0x004417ec 0x0002c612          700       0.000000                  700 OK(int)
+ 15 thumbstick                       0x01 0x004416ec 0x0002c61b            1       0.000000                 TRUE 
+ 16 thumbstick_center_x              0x07 0x004417c4 0x0002c624         2050       0.000000                 2050 OK(int)
+ 17 thumbstick_min_x                 0x07 0x004417b0 0x0002c62d         1350       0.000000                 1350 OK(int)
+ 18 thumbstick_max_x                 0x07 0x004417d8 0x0002c636         2750       0.000000                 2750 OK(int)
+ 19 thumbstick_center_y              0x07 0x00441814 0x0002c63f         2050       0.000000                 2050 OK(int)
+ 20 thumbstick_min_y                 0x07 0x00441800 0x0002c648         1350       0.000000                 1350 OK(int)
+ 21 thumbstick_max_y                 0x07 0x00441828 0x0002c651         2750       0.000000                 2750 OK(int)
+ 22 thumbstick_deadzone_raw          0x07 0x00441798 0x0002c65a          350       0.000000                  350 OK(int)
+ 23 haptics                          0x01 0x00441744 0x0002c663            1       0.000000                 TRUE 
+ 24 fsr                              0x01 0x00441740 0x0002c66c            1       0.000000                 TRUE 
+ 25 power_on_button_press_ms         0x07 0x0044174c 0x0002c675          400       0.000000                  400 OK(int)
+ 26 led_driver_current_r             0x07 0x0044170c 0x0002c67e            8       0.000000                    8 OK(int)
+ 27 led_driver_current_g             0x07 0x004416d4 0x0002c687            8       0.000000                    8 OK(int)
+ 28 led_driver_current_b             0x07 0x00441638 0x0002c690            8       0.000000                    8 OK(int)
+ 29 led_driver_current_w             0x07 0x00441780 0x0002c699            8       0.000000                    8 OK(int)
+ 30 product_name                     0x0a 0x004416b0 0x0002c6a2      4462380       0.000000     Index Controller 
+ 31 finger_type                      0x2c 0x0c004417 0x0002c6ab   1073759203       2.004143                   11 
+ 32 sensor_enable                    0xe3 0xe3300043 0x0002c6b4    538443843       0.000000             66846654 
+ 33 sensor_env_on_pin_a              0x00 0xe4480520 0x0002c6bd   1208025155  132097.046875               147456 
+ 34 trackpad                         0xe5 0x11d00043 0x0002c6c6   -479723452 -4279663765399032299520.000000                    8 
+ 35 thumbstick_flip_x                0x43 0xe4580800 0x0002c6cf    335740995       0.000000                    1 
+ 36 thumbstick_flip_y                0xe5 0xd0010043 0x0002c6d8     83903460       0.000000                    1 
+ 37 fsr_grip_A                       0x54 0x020043e5 0x0002c6e1      4449684       0.000000               -0.255 
+ 38 fsr_grip_B                       0x1f 0x20002054 0x0002c6ea   1107937555      34.446362                 0.92 
+ 39 fsr_grip_C                       0x00 0x0042031d 0x0002c6f3            0       0.000000               0.2772 
+ 40 fsr_grip_D                       0x21 0x41004201 0x0002c6fc   -452967934 -37855033689460468350976.000000             1.253725 
+ 41 fsr_thumb_A                      0x00 0x00f50042 0x0002c705           66       0.000000               -0.245 
+ 42 fsr_thumb_B                      0x00 0x00000100 0x0002c70e          256       0.000000                 0.91 
+ 43 fsr_thumb_C                      0x00 0x00000002 0x0002c717            2       0.000000             0.269199 
+ 44 fsr_thumb_D                      0x04 0x03000000 0x0002c720            0       0.000000             1.132344 
+ 45 debug                            0x02 0x00040000 0x0002c729     67108864       0.000000                    1 

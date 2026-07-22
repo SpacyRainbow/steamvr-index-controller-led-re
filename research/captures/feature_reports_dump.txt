@@ -1,0 +1,47 @@
+=== /dev/hidraw19 ===
+  GET_FEATURE id=0x01 len=2: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x03 len=46: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x04 len=4: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x07 len=4: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x05 len=52: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x08 len=8: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x09 len=63: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x06 len=1: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x0c len=1: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x0d len=1: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x13 len=63: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x15 len=62: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x10 len=2: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x11 len=63: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x12 len=1: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x16 len=1: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x20 len=64: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x21 len=63: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x22 len=63: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x24 len=61: FAILED errno=32 (Broken pipe)
+
+=== /dev/hidraw21 ===
+  GET_FEATURE id=0x00 len=40: FAILED errno=32 (Broken pipe)
+
+=== /dev/hidraw14 ===
+  GET_FEATURE id=0x01 len=2: 010302
+  GET_FEATURE id=0x02 len=33: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0xff len=63: ff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  GET_FEATURE id=0x03 len=46: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x05 len=52: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x0b len=3: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x0a len=3: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x10 len=2: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x11 len=63: FAILED errno=32 (Broken pipe)
+
+=== /dev/hidraw16 ===
+  GET_FEATURE id=0x01 len=2: 010302
+  GET_FEATURE id=0x02 len=33: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0xff len=63: ff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  GET_FEATURE id=0x03 len=46: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x05 len=52: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x0b len=3: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x0a len=3: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x10 len=2: FAILED errno=32 (Broken pipe)
+  GET_FEATURE id=0x11 len=63: FAILED errno=32 (Broken pipe)
+

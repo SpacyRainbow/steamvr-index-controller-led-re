@@ -55,6 +55,27 @@ to run these.
   conclusion that this code does not directly call into the traced LED
   call graph.
 
+- **`06_pm_struct_base_address.java`** — reads each of the four known
+  power-management functions' literal-pool operand directly, confirming
+  they all load the same RAM address (`0x2000378c`) as their struct base
+  pointer. This is what turned "the PM code touches *some* struct" into a
+  concrete, searchable fact — see
+  `../../docs/06_firmware_symbols.md` §6.5.
+
+- **`07_pm_reference_investigation.java`** — given a list of raw
+  reference addresses found by a plain byte search for `0x2000378c`
+  (`docs/16_charging_led_research.md` follow-up session), uses Ghidra's
+  reference manager to identify the actual referencing instruction and
+  dump surrounding context for each. Found several new struct-field
+  offsets and one promising-but-ultimately-unrelated lead (the
+  `0x414dbc`/`0x414e38` timer functions).
+
+- **`08_tick_handler_decompile.java`** — full decompilation of
+  `0x414dbc`/`0x414e38`, which resolved the timer-function lead above as a
+  dead end (confirmed via an embedded `tick_handler.c` assert string and
+  each function's 19–20 unrelated callers). See
+  `../../docs/14_failed_attempts.md`.
+
 ## Output files
 
 - **`wrapper_decompile.c`** — cleaned, annotated decompilation of the

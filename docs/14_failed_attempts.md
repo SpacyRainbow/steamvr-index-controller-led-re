@@ -267,6 +267,77 @@ understanding *why* Ghidra's reference analysis misses these specific
 cases could unblock several currently-open questions at once (see
 `docs/18_future_work.md`).
 
+### The `0x414dbc`/`0x414e38` "glow trigger" lead was actually a generic timer facility
+
+**Tried:** during the follow-up power-management data-flow session
+(`docs/16_charging_led_research.md`), found that code reading a
+power-management struct field (`+0x24`, scaled by 1000) calls two
+functions, `0x414dbc` and `0x414e38` — the exact same two functions the
+LED subsystem's `FUN_0041d6b4` calls for its "glow" pattern trigger
+(`docs/06_firmware_symbols.md` §6.3). This looked like a strong, direct
+LED connection.
+**Result:** decompiling both functions fully with Ghidra showed they are
+general-purpose software-timer registration (`0x414dbc`, takes a context
+ID, a delay, a flag byte, and a callback argument, storing into a 20-slot
+table) and cancellation (`0x414e38`, matches and clears a slot by context
+ID). An embedded assert string confirms the source file is `tick_handler.c`
+— a generic RTOS scheduling primitive. Checking their caller lists found
+19–20 callers each, spanning addresses all over the firmware, consistent
+with a widely-shared utility rather than an LED-specific one.
+**Learned:** the LED subsystem uses this generic timer facility to
+schedule its own glow-animation ticks; the power-management code
+independently uses the same facility for an unrelated purpose (most likely
+a timeout, given the `*1000` scaling from what is presumably a
+seconds-denominated struct field). Sharing a generic utility function is
+not evidence of a direct relationship between two callers — this is a
+concrete example of that general caution.
+**Retry recommended:** no — this specific lead is closed. The two
+functions remain useful as a landmark for finding *other* code that
+schedules timed events, but not as an LED-connection lead.
+
+### Brute-force `BL`-encoding search had a real bug (found, fixed, prior results re-verified)
+
+**Tried:** while continuing the search for callers of newly-identified
+power-management functions (the `docs/16_charging_led_research.md`
+follow-up session), the exhaustive direct-call-encoding search technique
+(previously used successfully to find the LED wrapper's real callers, and
+trusted as "alignment-independent" and therefore highly reliable) reported
+a caller for a `+0x28`-checking function.
+**Result:** manually cross-checking that specific instruction with
+`capstone` showed it actually encodes a call to a *different* address —
+the search had produced a false positive. Tracing the bug to its source
+found a bit-shift error in the immediate-field encoding
+(`imm10 = (imm >> 13) & 0x3FF` where the correct shift, per the ARM
+architecture reference, is `>> 11`), which can alias two different call
+targets onto identical encoded bytes for certain offset magnitudes.
+**Follow-up:** the bug was fixed and committed as
+`scripts/find_bl_callers.py` (previously this technique existed only as an
+uncommitted inline script during live sessions, not a saved, reusable
+tool). The corrected version was re-run against every previously-documented
+"zero callers" finding that depended on this technique — most importantly
+the LED Layer-3 functions (`0x41d6fa`, `0x41d938`, `0x41da90`,
+`docs/16_charging_led_research.md`) — and **the results did not change**;
+those functions still show zero direct callers under the corrected
+encoder. The central conclusions of `docs/16_charging_led_research.md`
+are therefore unaffected by this bug.
+**Learned:** even a technique designed to be more rigorous than disassembly
+(exact byte-pattern matching, no alignment assumptions) can still have an
+implementation bug — the fix here was to independently cross-verify with a
+second, unrelated tool (`capstone`) the moment a result looked surprising,
+rather than trusting a single method's output at face value, especially
+for a *positive* (nonzero) result. Zero-result findings from this
+technique are comparatively safer to trust (a bug that mis-encodes bytes
+can produce a spurious match, but is very unlikely to spuriously produce
+zero matches when a real one exists, since that would require the bug to
+consistently avoid encoding the one correct answer while still matching
+nothing else by chance).
+**Retry recommended:** no further action needed — bug fixed, tool
+committed with the bug history documented in its own module docstring, and
+the dependent conclusions re-verified. Anyone using
+`scripts/find_bl_callers.py` going forward should still manually
+cross-check any nonzero result, per the caution now embedded in the
+script's own docstring.
+
 ## Environment/tooling dead ends (preserved because they cost real time)
 
 ### Ghidra headless launcher rejects a technically-correct Java version

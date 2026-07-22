@@ -140,6 +140,91 @@ task than call-graph tracing, since it requires either data-flow analysis
 across the entire compiled unit or runtime observation (e.g., a debugger or
 memory-watch capability this project did not have access to).
 
+## Follow-up session: locating the PM struct and its readers (partial progress, connection still not found)
+
+A later session (with live hardware still connected but no ability to
+visually observe the controller — see `docs/13_experiments.md`) picked
+this up using the data-flow approach recommended above. Concrete new
+findings, none of which close the open question, but all narrowing the
+search space for whoever continues this work:
+
+**The PM state struct's exact RAM address was found: `0x2000378c`.** All
+four of the power-management functions identified in the previous section
+load this same address as their struct base pointer (confirmed via a
+Ghidra script reading each function's literal pool operand directly). This
+is a concrete, reusable fact — previously only the *offsets within* the
+struct (`+0xc` for the main state enum) were known, not its absolute
+location.
+
+**A raw search for every other reference to `0x2000378c` in the firmware
+image found 14 additional locations** beyond the four already known (a
+plain 4-byte little-endian pattern search, not dependent on any
+disassembly). This is a stronger technique than searching for a function's
+own address, because a data address referenced by an unrelated reader
+function will have its own, independent literal pool entry pointing at the
+same struct, unaffected by whatever indirect-dispatch mechanism is hiding
+the reader function's *own* callers.
+
+Investigating these 14 locations found:
+
+- **New struct field offsets in use**: `+0x28` (a byte, checked as a
+  boolean-like condition), `+0x15` and `+0x16` (two separate byte flags,
+  each set to `1` from different, unrelated call sites — not the same
+  code that writes `+0xc`), and `+0x24` (read and multiplied by 1000,
+  suggesting a duration in seconds converted to milliseconds).
+- **A lead that looked very promising and turned out to be a false trail**:
+  code reading `+0x24` calls two functions, `0x414dbc` and `0x414e38`,
+  which are the *exact same two functions* the LED subsystem's
+  `FUN_0041d6b4` (`docs/06_firmware_symbols.md` §6.3) calls when applying a
+  "glow" pattern. Decompiling both fully (Ghidra) resolved this: they are
+  general-purpose software-timer registration/cancellation primitives
+  (source file `tick_handler.c`, confirmed via an embedded assert string),
+  each with 19–20 unrelated callers spanning the entire firmware. The LED
+  subsystem uses them to schedule glow-animation timer ticks; the
+  power-management code uses them for something else entirely (most likely
+  an unrelated timeout). This is a real, understood dead end — see
+  `docs/14_failed_attempts.md`.
+- **The same "zero direct callers" symptom recurs** for the new
+  `+0x28`-checking and `+0x15`/`+0x16`-writing functions, using the exact
+  same three independent search methods that failed for the LED Layer-3
+  functions (Ghidra reference manager, raw stored-pointer search, and an
+  exhaustive direct-call-encoding search — the last of which required a
+  bug fix mid-investigation, see below). **This generalizes the earlier
+  finding**: it is not that the LED policy specifically is hidden behind
+  some LED-only indirect-dispatch mechanism — multiple, unrelated
+  subsystems (LED state application *and* power-management flag setters)
+  exhibit the identical symptom. This suggests a firmware-wide, generic
+  dispatch architecture (plausibly a table-driven state-machine or event
+  framework used throughout this RTOS firmware) is the actual thing
+  standing in the way, not something specific to LED policy. Understanding
+  *that* generic mechanism, once, would likely unlock this question and
+  probably others — see `docs/18_future_work.md`.
+
+**A tooling bug was found and fixed during this session.** The
+brute-force direct-call-encoding search (`scripts/find_bl_callers.py`,
+previously used only as an uncommitted inline script) had a bit-shift
+error that could, for certain offset magnitudes, alias two different call
+targets onto the same encoded instruction bytes — producing an occasional
+false-positive "caller." This was caught when a result for the `+0x28`
+checker function was manually cross-checked with `capstone` and found to
+actually be a call to a different, unrelated address. **The bug was fixed,
+and the tool was re-run against the previously-documented "zero callers"
+findings for the LED Layer-3 functions (`0x41d6fa`, `0x41d938`,
+`0x41da90`) — the result did not change; those functions still have zero
+findable direct callers.** The central conclusion of this document is
+therefore unaffected. See the bug-history note in
+`scripts/find_bl_callers.py`'s module docstring for full detail, and
+`docs/14_failed_attempts.md` for why this is preserved rather than quietly
+fixed and forgotten.
+
+**Status after this session: still open.** No selective (charging-aware)
+patch was produced or could be produced — the connection between
+power-management state and LED color remains unlocated, so there is
+nothing yet to conditionally branch on. This session's value is in the new
+concrete facts above (struct address, field offsets, one ruled-out lead,
+one corrected tool) and the reframed hypothesis (a generic dispatch
+mechanism, not an LED-specific one) — not in a working patch.
+
 ## Tooling used, and what it does/doesn't help with
 
 A full headless Ghidra 12.1.2 installation was set up specifically to
@@ -166,7 +251,7 @@ the RTOS shared-state connection. Both would likely benefit from:
 ## Current recommendation
 
 See `docs/18_future_work.md` for the prioritized next steps. In summary,
-the two most promising next actions, neither attempted in this project:
+the most promising next actions:
 
 1. **Live USB traffic capture** during an actual charging-state transition
    on the real device (requires either a hardware USB tap or `usbmon` on
@@ -175,11 +260,23 @@ the two most promising next actions, neither attempted in this project:
    plug-in/charge-termination event, correlated with the physical LED
    color, would let the researcher work backward from confirmed telemetry
    rather than forward from an incomplete static trace.
-2. **Data-flow analysis in Ghidra** starting from the power-management
-   task's known state-variable write locations (the `str r0,[r4,#0xc]`-style
-   writes visible in the manually-read gap listing,
-   `research/decompiler_notes/pm_gap_listing.txt`) to find every code
-   location that subsequently *reads* the same struct field — this is a
-   different, more targeted question than "who calls this function," and
-   Ghidra's decompiler-backed data-flow tools are well suited to it, though
-   this project ran out of time before attempting it.
+2. **Understand the generic dispatch mechanism directly**, rather than
+   continuing to chase individual LED- or PM-specific leads. The follow-up
+   session above found that *multiple, unrelated* subsystems (LED state
+   application, power-management flag setters) share the identical
+   "invoked with zero statically-findable direct callers" symptom. This
+   strongly suggests one shared, firmware-wide dispatch/event framework is
+   responsible, not something specific to either subsystem. Finding and
+   understanding *that* mechanism once — most likely by picking one of its
+   simplest-looking victims and tracing every reference to *it*, or by
+   searching for whatever data structure such a framework would need
+   (a table of {condition, handler} pairs, a priority queue, or similar) —
+   would likely unlock this question and any other question with the same
+   symptom, rather than requiring a fresh investigation per function.
+3. **Data-flow analysis in Ghidra** starting from the power-management
+   struct's now-known base address (`0x2000378c`) and the field offsets
+   identified in the follow-up session above (`+0xc`, `+0xd`, `+0x15`,
+   `+0x16`, `+0x24`, `+0x28`) — a raw-address search (as done for
+   `0x2000378c` itself) is a cheap first pass; true data-flow/value-set
+   analysis through Ghidra's P-code APIs is the more thorough follow-up if
+   the raw search doesn't find the reader directly.

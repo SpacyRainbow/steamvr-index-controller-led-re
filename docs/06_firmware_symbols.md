@@ -162,7 +162,38 @@ Highlights:
   immediately preceded by a 4-byte RAM pointer, believed to be a
   module-specific log-gating variable).
 
-## 6.5 What is NOT yet mapped
+## 6.5 The power-management state struct (partially mapped, 90% confidence on fields listed)
+
+Found during the `docs/16_charging_led_research.md` follow-up session by
+identifying the literal-pool operand loaded by every known
+power-management function (`docs/16_charging_led_research.md` "The
+power-management task lead"), all of which load the same address.
+
+**Base address (RAM, not flash): `0x2000378c`.** Confirmed via four
+independent functions' literal pool operands, and via 14 further raw
+references to this exact address elsewhere in the firmware image
+(`docs/16_charging_led_research.md` follow-up session).
+
+Known field offsets, from the functions examined so far — **this is not
+a claimed-complete struct layout**, only the fields actually observed in
+use:
+
+| Offset | Size | Observed usage |
+|---|---|---|
+| `+0xc` | 1+ byte (compared against small integers 0-5) | Main charging-state enum. Written by the four core PM state-transition functions (`docs/16_charging_led_research.md`). Values correspond, by position in the surrounding log strings, to something like not-charging/pre-charging/fast-charging/on/charge-term/sleep, though the exact enum-to-string mapping was not confirmed field-by-field. |
+| `+0xd` | 1 byte | Written alongside `+0xc` in one function (`0x417f04` region), set to `0` right after `+0xc` is set to `5` — plausibly a "sub-state" or "just transitioned" flag. |
+| `+0x15` | 1 byte | Boolean-like flag, set to `1` from at least two different, unrelated call sites (`0x41c30c`, and one of the four core PM functions). Plausibly a "tracking" flag, based on the nearby log string `"tracking on"`/`"tracking off"` (`docs/16_charging_led_research.md`), but not confirmed by directly correlating a specific write site with that specific string. |
+| `+0x16` | 1 byte | Same pattern as `+0x15` — boolean-like, set from multiple unrelated sites (`0x429814`, and one of the four core PM functions). |
+| `+0x24` | 4 bytes (read as an integer, multiplied by 1000) | Read by code that then registers a software timer (`docs/16_charging_led_research.md` "The `0x414dbc`/`0x414e38`... lead" — this specific lead was a dead end for LED purposes, but the field itself is real). Plausibly a duration in seconds. |
+| `+0x28` | 1 byte | Checked as a boolean-like condition by a function with (as of this writing) zero statically-findable direct callers — see `docs/16_charging_led_research.md`. |
+
+**Not yet found:** any code that *reads* `+0xc` (the main state enum) —
+every reference located so far either writes it or is one of the four
+originally-identified PM state-transition functions themselves. Finding
+a reader of this specific field is the most direct remaining path to the
+open question in `docs/16_charging_led_research.md`.
+
+## 6.6 What is NOT yet mapped
 
 - The RTOS task functions themselves (only referenced by name via the
   debug shell's `tasks` command output — `shell, IDLE, sync on beam,

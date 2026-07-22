@@ -219,6 +219,35 @@ exploratory scanning.
 
 ---
 
+## `find_bl_callers.py`
+
+**Purpose:** find every direct Thumb-2 `BL` call to a given target address
+by computing the exact instruction encoding for a call from every possible
+source address and searching for those exact bytes — bypassing
+disassembly and any code/data alignment issues entirely. This is the
+technique that established (with high confidence) that several firmware
+functions have zero direct callers, most importantly the LED policy's
+Layer-3 entry points (`../docs/16_charging_led_research.md`).
+
+**Requirements:** a decompressed firmware image (see
+`../docs/04_firmware_acquisition.md`); no third-party dependencies.
+
+**Usage:** `python3 find_bl_callers.py <target_hex_addr> [<target_hex_addr> ...]`
+
+**Expected output:** for each target, the list of source addresses that
+contain a valid direct `BL` call to it.
+
+**Important:** this script's encoder had a real bug (a bit-shift error)
+that was found and fixed during the project's second research session —
+see the bug-history note in the module's own docstring, and
+`../docs/14_failed_attempts.md`. **Always manually cross-check any nonzero
+result** (e.g. with `capstone` or Ghidra) before trusting it; a single
+coincidental encoding collision can't be ruled out in general, even with
+the fix. Zero-result findings are comparatively safer to trust (see the
+docstring for the reasoning).
+
+---
+
 ## `patch_led_firmware.py`
 
 **Purpose:** Patch A — set all four `led_driver_current_{r,g,b,w}` config

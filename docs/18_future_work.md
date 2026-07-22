@@ -85,8 +85,16 @@ preserve charging/charged indication). Full context in
 
 **Difficulty:** High. Static call-graph tracing has been exhausted (three
 independent methods, all failed to find Layer 3's callers — see
-`docs/14_failed_attempts.md`). Remaining approaches require either
-data-flow analysis or live hardware observation.
+`docs/14_failed_attempts.md`). A follow-up session made concrete progress
+without closing the question: found the PM state struct's exact RAM
+address (`0x2000378c`) and several more of its field offsets
+(`docs/06_firmware_symbols.md` §6.5), ruled out one promising-looking lead
+(a shared generic timer facility, not LED-specific), and — most
+importantly — found that the "zero statically-findable callers" symptom
+recurs for multiple *unrelated* functions (LED policy entry points AND
+power-management flag setters), suggesting a firmware-wide generic
+dispatch mechanism is the real obstacle, not something LED-specific. See
+`docs/16_charging_led_research.md` "Follow-up session" for full detail.
 
 **Expected value:** High — this is the single most user-valuable
 improvement over the current "always off" patch, and was the specific
@@ -94,20 +102,25 @@ follow-up request that motivated this entire line of investigation.
 
 **Likelihood of success:** Moderate (~50%). The architecture is understood
 well enough to know *what kind* of answer to look for (a shared RTOS
-variable, most likely); finding the exact location is a matter of applying
-the right technique, not an open-ended unknown.
+variable/dispatch mechanism); finding the exact location is a matter of
+applying the right technique, not an open-ended unknown.
 
 **Recommended approach, in order:**
 1. Live USB traffic capture (`usbmon` or a hardware USB tap) during a real
    charging-state transition on the physical device, correlated with
    directly observed/photographed LED color. This sidesteps static analysis
    entirely by providing ground-truth data to work backward from.
-2. Ghidra data-flow analysis starting from the power-management task's
-   known state-variable write instructions
-   (`research/decompiler_notes/pm_gap_listing.txt` has the exact
-   addresses), searching for all reads of the same memory location/struct
-   field, rather than searching for direct function calls.
-3. If hardware access allows it, an SWD/JTAG debug probe on the nRF52840
+2. Investigate the generic dispatch mechanism itself (see
+   `docs/16_charging_led_research.md` "Current recommendation" item 2) —
+   now believed to be the actual blocker shared by both the LED and
+   power-management investigations, rather than chasing either subsystem
+   individually.
+3. Ghidra data-flow analysis starting from the power-management struct's
+   now-known address (`0x2000378c`) and field offsets
+   (`docs/06_firmware_symbols.md` §6.5) — no code was found that *reads*
+   the main state enum at `+0xc`; finding that reader is the most direct
+   remaining lead.
+4. If hardware access allows it, an SWD/JTAG debug probe on the nRF52840
    for live memory/register inspection — the most direct method, not
    attempted in this project due to lack of the necessary probe hardware.
 

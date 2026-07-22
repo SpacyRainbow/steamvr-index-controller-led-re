@@ -130,7 +130,7 @@ task.
 ## Unsupported hardware
 
 This project tested exactly one physical unit (a wired Index Controller,
-serial `LHR-80E7752A`). Wireless-only (dongle-paired) controllers were
+serial `LHR-XXXXXXXX`). Wireless-only (dongle-paired) controllers were
 never flashed or patched — all `lighthouse_watchman_update` invocations in
 this project used `--via-application` (a wired-application-interface mode);
 the tool also supports `--via-dongle` for wireless updates, which was never

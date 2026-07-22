@@ -2,7 +2,7 @@
 
 All commands below are issued over the undocumented USB HID "Debug"
 interface (`docs/12_debug_interfaces.md`). All were tested live against the
-project's test controller (serial `LHR-80E7752A`). Full raw transcripts are
+project's test controller (serial `LHR-XXXXXXXX`). Full raw transcripts are
 preserved in `research/captures/`.
 
 For each command: where it was discovered, what was tested, the exact
@@ -29,7 +29,7 @@ framing (see `docs/12_debug_interfaces.md` for the framing bug and fix).
 every firmware flash).
 
 ```
-S/N: LHR-80E7752A
+S/N: LHR-XXXXXXXX
 HWID: 0x110e0009 (Index Controller)
 App ver: 0x64f2df77 1693638519 / 2023-09-02 00:08:39 git: 2c3286c3
 Radio ver: 0x5d27b2a9 1562882729

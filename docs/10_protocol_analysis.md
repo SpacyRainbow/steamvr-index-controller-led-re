@@ -113,7 +113,7 @@ Relevant command-line flags discovered via `--help` and used successfully:
 ```
 Searching for devices with any HWID
 Found 1 matching device
-Serial: LHR-80E7752A, PID: 2300, HWID: 110e0009 (index controller pv right)
+Serial: LHR-XXXXXXXX, PID: 2300, HWID: 110e0009 (index controller pv right)
 Updating device: 1 of 1
 Attempting to update WATCHMAN v3 (target: 2) via application
 Computed checksum (offset 0): 00000000

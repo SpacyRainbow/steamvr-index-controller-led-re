@@ -21,4 +21,4 @@ you would lab notebook raw data: not polished, but authoritative.
 | `haptic_sanity_check_log.txt` | Early sanity check confirming the wired connection is a full HID link | `docs/02_background.md`, `scripts/test_haptic_sanity_check.py` |
 
 All captures are from the single test unit described in `docs/03_hardware.md`
-(serial `LHR-80E7752A`).
+(serial `LHR-XXXXXXXX`).

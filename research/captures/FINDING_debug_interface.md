@@ -1,7 +1,7 @@
 # Finding: hidden "Debug" HID interface unlocked via Feature report 0x12
 
 **Date:** 2026-07-22
-**Device:** Wired Index Controller, serial `LHR-80E7752A`, bus 001 (originally device 012, now device 013 after reset)
+**Device:** Wired Index Controller, serial `LHR-XXXXXXXX`, bus 001 (originally device 012, now device 013 after reset)
 
 ## Sequence of events
 
@@ -12,7 +12,7 @@
 5. `SET_FEATURE(0x0d, 0x01)` → OK, revert → OK.
 6. `SET_FEATURE(0x12, 0x01)` → OK. **~2.5s later**, the revert call (`SET_FEATURE(0x12, 0x00)`) failed with `errno=19 ENODEV ("No such device")`.
 7. `SET_FEATURE(0x16, 0x01)` also failed with `ENODEV` — consistent with the device having already reset by this point (not a separate finding).
-8. Checked `lsusb`: device re-enumerated as **Bus 001 Device 013** (was 012), same serial `LHR-80E7752A` — confirms this is a controller-initiated USB reset/re-enumeration, not a disconnect or crash. Device is healthy.
+8. Checked `lsusb`: device re-enumerated as **Bus 001 Device 013** (was 012), same serial `LHR-XXXXXXXX` — confirms this is a controller-initiated USB reset/re-enumeration, not a disconnect or crash. Device is healthy.
 9. **New USB configuration has 4 interfaces, not 3.** The new 4th interface (bInterfaceNumber 3, input3) has `iInterface` string **"Debug"**.
 
 ## Working hypothesis

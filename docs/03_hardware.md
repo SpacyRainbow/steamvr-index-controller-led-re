@@ -13,7 +13,7 @@ evidence. Photographic documentation is listed as future work
 
 | Field | Value | Source |
 |---|---|---|
-| Serial number | `LHR-80E7752A` | live `info` debug shell command |
+| Serial number | `LHR-XXXXXXXX` | live `info` debug shell command |
 | HWID | `0x110e0009` ("Index Controller") | live `info` debug shell command |
 | App firmware version | `0x64f2df77`, build timestamp `1693638519` (2023-09-02 00:08:39), git `2c3286c3` | live `info` debug shell command |
 | Radio firmware version | `0x5d27b2a9`, build timestamp `1562882729` | live `info` debug shell command |

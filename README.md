@@ -52,7 +52,7 @@ traced to the exact code that decides those colors. See
 
 ## Hardware and software scope
 
-- **Controller tested:** wired Valve Index Controller, serial `LHR-80E7752A`,
+- **Controller tested:** wired Valve Index Controller, serial `LHR-XXXXXXXX`,
   HWID `0x110e0009`.
 - **Firmware analyzed:** `indexcontroller_app_20230902_v1693638519.fw`
   (2023-09-02, git `2c3286c3`) as the primary target, cross-checked against

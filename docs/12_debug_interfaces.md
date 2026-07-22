@@ -27,7 +27,7 @@ re-enumerate on USB with a fourth HID interface** (`input3`), whose
 
 ## Confirming it is the same physical device
 
-The device's USB serial descriptor (`LHR-80E7752A`) was confirmed identical
+The device's USB serial descriptor (`LHR-XXXXXXXX`) was confirmed identical
 before and after the reset, while the Linux USB device number changed (e.g.
 012 → 013) — the expected behavior for a genuine re-enumeration of the same
 physical device, not a different device appearing.

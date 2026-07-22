@@ -148,3 +148,61 @@ are present at the target offset before writing, and aborts loudly (does
 not silently proceed) if they are not — this prevents accidentally
 patching the wrong instruction if applied against an unexpected firmware
 build. Do not bypass or remove this check in any derivative work.
+
+---
+
+## Patch C — force LED to a fixed blue color — **UNTESTED, not yet flashed to real hardware**
+
+**File:** `patch_C_led_blue_255.decompressed.xdelta3`
+**Generator script:** `../scripts/patch_led_solid_color.py`
+
+**Status:** this patch was designed and file-verified during a session
+with no physical access to the test controller. Everything below is a
+documented *plan and expectation*, not an observed result. See
+`../docs/18_future_work.md` Priority 1 for the recommendation to flash and
+verify it as the first task in the next session with hardware access, and
+`../docs/13_experiments.md`, which intentionally does **not** yet contain
+an entry for this patch — one should be added once it's actually tested.
+
+**Goal:** produce a specific, visually striking color (not just
+"off") using the exact same low-risk mechanism as the proven Patch B, as a
+second, independent demonstration of software LED control — and
+specifically a color the controller's known normal states (green/orange/
+white, `../docs/09_led_policy.md`) don't produce.
+
+**Reasoning:** Patch B's patch point captures the fully-computed color
+value in register `r4` before it's split into per-channel writes.
+Patch B replaces that capture with `movs r4, #0` (always zero). The same
+instruction family, `movs r4, #<any 8-bit value>`, is still only a 2-byte
+Thumb instruction — no larger than the original — so it drops into the
+exact same slot with the exact same "no code needs to move" property that
+made Patch B safe.
+
+**Binary location:** identical to Patch B — decompressed image, file
+offset `0xBC20` (runtime address `0x41DC20`).
+
+**Patch description:** replace `04 46` (`mov r4, r0`) with `<lo> 24` where
+`<lo>` is the desired blue intensity byte (e.g. `ff 24` for maximum
+intensity, encoding `movs r4, #0xff`).
+
+**Expected outcome (not yet observed):** every LED color request forced to
+pure blue (packed color `0x000000ff` at max intensity) — W, R, and G all
+forced to zero, since the instruction zero-extends into the whole
+register. This is a hard *limitation* of this specific technique, not a
+design choice — see `../docs/15_firmware_patching.md` §15.3 for why a
+different, harder patch (a code cave) would be needed to reach a
+two-channel color like purple.
+
+**Side effects:** same as Patch B — unconditional across all device
+states, including charging/charged indication.
+
+**Rollback procedure:** identical to Patch B — flash the original,
+unmodified firmware.
+
+**Compatibility:** same firmware-build specificity as Patch B.
+
+**Safety notes:** same built-in byte-verification safety check as Patch B.
+Additionally: because this patch is unverified on real hardware, treat the
+very first flash of it with the same caution as any first-time firmware
+modification (`../docs/17_safety.md`) — don't assume it's as
+"pre-validated" as Patch B just because it reuses the same mechanism.

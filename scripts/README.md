@@ -268,6 +268,40 @@ documented in `hashes/firmware_hashes.txt` — see
 
 ---
 
+## `patch_led_solid_color.py`
+
+**Purpose:** Patch C — generalizes `patch_led_black.py`'s technique to any
+single-byte value, producing shades of pure blue instead of only black.
+**UNTESTED on real hardware** — built and file-verified only, during a
+session with no physical access to the controller. Full documentation:
+`../docs/15_firmware_patching.md` §15.3 "Patch C",
+`../docs/18_future_work.md` Priority 1 (flashing/verifying this is the
+recommended first task for the next session with hardware access),
+`../patches/README.md`.
+
+**Requirements:** same as `patch_led_black.py`.
+
+**Usage:** `python3 patch_led_solid_color.py <0-255>` (e.g. `255` for
+maximum-intensity blue; `0` is equivalent to `patch_led_black.py`, but use
+that script directly for the black case since it's the proven one).
+
+**Expected output:** same structure as `patch_led_black.py` — byte
+replacement confirmation, recompressed size, recomputed CRCs, and a
+PASS/FAIL round-trip verification, plus an explicit printed reminder that
+the output has not been flashed to real hardware.
+
+**Limitations:** same firmware-build specificity as `patch_led_black.py`.
+Additionally, and more fundamentally: this technique can only reach colors
+of the form (W=0, R=0, G=0, B=n) — pure blue shades — because the
+underlying Thumb instruction (`movs Rd, #imm8`) zero-extends into the
+whole register, not just one byte. It **cannot** produce red, green, or
+any two-channel combination like purple. See
+`../docs/15_firmware_patching.md` §15.3 "Why a code-cave is needed for
+two-channel colors" for why, and what a purple-capable patch would
+actually require.
+
+---
+
 ## `test_haptic_sanity_check.py`
 
 **Purpose:** early-project sanity check confirming the wired controller

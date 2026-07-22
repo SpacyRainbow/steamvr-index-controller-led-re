@@ -37,7 +37,9 @@ b109ff5a51a77d432d3b21e13310b033a22be952d14ddc2732fc01e3bf2cbde3  indexcontrolle
 c3abc668c9ef2481f772d2d55227f709c82cad30f8b33bda831312ae42c52233  indexcontroller_app_LEDTEST_v255.fw  patch A, led_driver_current_*=255 (scripts/patch_led_firmware.py 255) -- built from the 20230902 base
 1bc5f8a999b7e6e1cec93f1fecc8aae0c849e6540096d89c5bb64c2f6970f8cc  indexcontroller_app_LEDTEST_v0.fw    patch A, led_driver_current_*=0   (scripts/patch_led_firmware.py 0)
 e3800372d74a2afc3a5ff034f0472e5336f4ae5212eea221048253e940a27af3  indexcontroller_app_LEDBLACK.fw      patch B, forced-black code patch  (scripts/patch_led_black.py) -- the primary proven positive-result patch, docs/13_experiments.md Experiment 7
+6ede6d2b2b54fa2785c155dc08ed05fd406bd45e86c07960433d474462d30433  indexcontroller_app_LEDBLUE_255.fw   patch C, forced-blue code patch   (scripts/patch_led_solid_color.py 255) -- UNTESTED on real hardware, see docs/15_firmware_patching.md sec 15.3 Patch C
 
 7328addf5745fe68a28e120eaa8134f065ad9a602d26f039eed0afc12588ffc4  indexcontroller_app_LEDTEST_v255.decompressed.bin
 e33aea641e72cff911075e62edebdbed3aae65c3a34c11116f71caf0e56ededd  indexcontroller_app_LEDTEST_v0.decompressed.bin
 2ee59c7fc226a38dd519f80a683b15392d5f3ae7474cd6808cede8a53f67b7b5  indexcontroller_app_LEDBLACK.decompressed.bin
+f8a234889a5afba8b4932438ac64e8149851ed2c24d97983be9c68a7ef2bd9a5  indexcontroller_app_LEDBLUE_255.decompressed.bin

@@ -50,6 +50,38 @@ traced to the exact code that decides those colors. See
 | 8 | The low-level LED PWM-write function was located, patched, and the patch visually confirmed to turn the LED off on real hardware | 100% (reproduced live) | `docs/15_firmware_patching.md`, `docs/13_experiments.md` Experiment 7 |
 | 9 | The state-to-color policy decision (which color for "charging" vs "ready") is **not yet located** — it lives beyond an RTOS task boundary (shared state, not a direct call) | Hypothesis, ~70% | `docs/16_charging_led_research.md` |
 
+## What didn't work
+
+This project treats a documented dead end as a real deliverable, not a
+footnote — reproducing a failed approach costs real time, and the whole
+point of this archive is to save the next person that time. Every failed
+technique below is written up in full (what was tried, why it seemed
+reasonable, why it failed, what it ruled out) in
+**`docs/14_failed_attempts.md`**. Headline entries:
+
+- The debug shell's `config` command cannot write values through any
+  syntax tried — real time was spent confirming this negative result
+  before pivoting to firmware flashing instead, which worked.
+- Three independent, individually-reliable methods (Ghidra's reference
+  manager, an exhaustive brute-force call-site search, a raw stored-pointer
+  search) all failed to find who calls the LED policy's per-state entry
+  points — see `docs/16_charging_led_research.md` for why this consistent
+  failure is itself meaningful evidence, not just "didn't look hard
+  enough."
+- An early manual (pre-Ghidra) disassembly pass misattributed an indirect
+  call pattern to the wrong function, sending part of the investigation
+  down a wrong path for a while — preserved as a concrete cautionary
+  example of how manual ARM disassembly without independently-verified
+  function boundaries can go wrong.
+- `--restore-json` (Valve's own update tool flag) never produced a
+  findable configuration backup file in this project's testing, despite
+  two full successful firmware updates.
+
+None of this is hidden in a "known issues" appendix — `docs/14_failed_attempts.md`
+is linked from the repository layout below like every other document, and
+individual dead ends are cross-referenced from whichever `docs/` page they
+relate to, so you hit them in context, not just in one long list.
+
 ## Hardware and software scope
 
 - **Controller tested:** wired Valve Index Controller, serial `LHR-XXXXXXXX`,

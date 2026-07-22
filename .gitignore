@@ -1,0 +1,17 @@
+# Never commit firmware binaries -- see the top-level README's Legal
+# Notice and firmware/README.md. Patch scripts write their output into
+# 04_firmware/ by default; that directory is intentionally not tracked.
+04_firmware/
+*.fw
+*.decompressed.bin
+
+# Keep the xdelta3 binary patches in patches/ (those ARE tracked -- they
+# are diffs, not full firmware images, and are explicitly excluded from
+# the blanket *.fw/*.decompressed.bin ignore above via the negation
+# patterns below).
+!patches/*.xdelta3
+
+# Common local cruft
+__pycache__/
+*.pyc
+.DS_Store

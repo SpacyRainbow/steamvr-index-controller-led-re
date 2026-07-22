@@ -114,6 +114,103 @@ is a fixed byte substitution, not parameterized).
 see `docs/13_experiments.md` Experiment 7. This is the project's primary
 positive result.
 
+### Patch C — force LED to a fixed, unusual color (`scripts/patch_led_solid_color.py`) — UNTESTED
+
+**Status: built and verified as a well-formed `.fw` file; NOT yet flashed
+to real hardware.** This patch was designed and produced during a session
+with no physical access to the test controller. It reuses Patch B's exact
+mechanism and risk profile, and is expected on strong first-principles
+grounds to work, but "expected to work" is explicitly not the same
+confidence level as Patch B's "confirmed on real hardware" — do not treat
+this section as a proven result until someone flashes it and updates this
+document with the observed outcome (and, ideally, photographic evidence —
+`docs/18_future_work.md` Priority 2).
+
+**Motivation:** a natural follow-up question to the proven black patch is
+whether the same technique can produce a specific *visible* color — in
+particular, a color the controller's normal policy states don't produce
+(`docs/09_led_policy.md` lists green/orange/white as the only observed
+states), which would be an even more legible demonstration than "off" for
+an observer unfamiliar with the project.
+
+**What it changes:** the same 2-byte instruction at file offset `0xBC20`
+as Patch B, but replaced with `movs r4, #<value>` (Thumb-1 encoding
+`0x2400 | value`) instead of `movs r4, #0`.
+
+**Why this only reaches blue, not arbitrary colors:** `movs Rd, #imm8` is a
+zero-extending load — it sets the *entire* 32-bit register from an 8-bit
+immediate, not just the low byte. Given this firmware's packed color
+layout (`docs/06_firmware_symbols.md` §6.3: bits 31:24 = W, 23:16 = R,
+15:8 = G, 7:0 = B), any value loaded this way necessarily has W=R=G=0,
+with only the low (Blue) byte set. The reachable color space through this
+single-instruction patch is therefore exactly: black, and 255 shades of
+pure blue. This is a real, understood **limitation of the technique**, not
+an unexplained gap — see "Why a code-cave is needed for two-channel colors"
+below for what a true purple patch would require.
+
+**Usage:** `python3 scripts/patch_led_solid_color.py <0-255>` (e.g. `255`
+for maximum-intensity blue).
+
+**Expected outcome (unverified):** every LED color request, from every
+policy state, forced to pure blue at the specified intensity.
+
+**When this gets tested:** update this subsection with the actual observed
+outcome, add a corresponding entry to `docs/13_experiments.md`, and remove
+the "UNTESTED" status markers throughout this section and in
+`hashes/firmware_hashes.txt`.
+
+### Why a code-cave is needed for two-channel colors (e.g. true purple) — design notes, not yet implemented
+
+Purple requires both the Red and Blue channels nonzero simultaneously
+(e.g. `R=0x80, G=0x00, B=0x80`), which cannot be produced by a single
+`movs Rd, #imm8` instruction (see Patch C above). Loading an arbitrary
+32-bit constant into a register in Thumb code normally takes a
+`MOVW`/`MOVT` pair — two 32-bit-encoded Thumb-2 instructions, 4 bytes
+each, 8 bytes total — which does not fit in the 2-byte slot Patches B and
+C occupy without overwriting (and thereby breaking) the instructions
+immediately following it, which are still needed (the very next
+instruction, `lsrs r0, r0, #0x18`, feeds the W-channel branch decision —
+see `research/decompiler_notes/wrapper_decompile.c` and
+`docs/07_led_architecture.md` Layer 1).
+
+The standard technique for this situation is a **code cave**: replace the
+original short instruction with a branch to unused space elsewhere in the
+same firmware image, execute the longer replacement logic there (build the
+full 32-bit color constant, do whatever the original instruction did with
+it), then branch back to resume normal execution exactly where it would
+have continued. This is a well-established reverse-engineering patching
+technique in general, but applying it here requires design work not yet
+done in this project:
+
+1. **Finding safe unused space** within the *decompressed application
+   image itself* (not the separate `scratchpad` flash partition, which is
+   a different region of flash not necessarily reachable by a short-range
+   branch from this code, and not part of the image this project's
+   scripts actually modify — see `docs/05_firmware_layout.md` §5.3). The
+   application partition has some slack between the image's actual used
+   size (197,940 bytes) and its allocated size (204,800 bytes,
+   `docs/05_firmware_layout.md` §5.3) — whether that slack is (a) part of
+   the same decompressed byte range this project's scripts operate on, and
+   (b) actually safe to write arbitrary code into, was not determined.
+2. **Branch encoding.** A 2-byte Thumb unconditional branch (`B`) has a
+   range of roughly ±2 KB; reaching a code cave outside that range needs a
+   4-byte `B.W`, which itself doesn't fit in the original 2-byte slot
+   either — meaning even the "jump out" step likely needs a small amount
+   of instruction relocation/insertion beyond just the color-loading logic
+   itself, compounding the design work.
+3. **Testing.** None of the above has been attempted, even as a
+   file-level (unflashed) build. This is flagged as concrete future work
+   in `docs/18_future_work.md`, not attempted here because it requires
+   materially more careful design than Patches B/C to avoid a genuinely
+   higher risk of a broken patch (as opposed to Patches B/C, which reuse
+   an already-proven-safe patch point and instruction size).
+
+**Bottom line:** blue (Patch C) is a low-risk, same-technique extension of
+the proven black patch, ready to test. Purple (or any other two-channel
+color) is a meaningfully bigger undertaking that has not been designed to
+completion, let alone tested — do not attempt it without first reading and
+extending this design discussion.
+
 ## 15.4 On leaving version metadata unchanged
 
 Both patches described above leave the `.fw` footer's `app_ver`,

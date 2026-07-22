@@ -9,27 +9,63 @@ decision code itself, see `docs/16_charging_led_research.md`.
 
 ## Observed states and colors
 
-| State | Observed color | How observed | Confidence |
+**Correction (see note below the table):** an earlier version of this
+document, and several other documents in this repository, stated or
+implied that blue was a color "the controller never normally shows" and
+therefore a good target for a demonstration patch. **This was wrong** —
+per the user's direct, first-hand knowledge of Index Controller behavior,
+blue (solid and blinking) is a normal, existing LED state, used for
+USB/host connection status and pairing. This is corrected throughout the
+repository; see the correction note in `docs/14_failed_attempts.md`.
+
+| State | Observed/reported color | How known | Confidence |
 |---|---|---|---|
 | Powered on, not charging (normal use) | Green | Direct visual observation by the human tester, multiple times across the project | 100% (visually confirmed, repeatedly) |
-| Charging (connected to USB, battery below full) | Orange | Inferred from firmware log strings (`" PM -> charging\n"`, `"charge term"` etc. — see `docs/16_charging_led_research.md`) and the user's report at project start describing typical Index Controller behavior; **not independently visually confirmed during this specific project's live testing** (the test unit was observed either fully charged or with LED patches active during charging-relevant test windows) | 50% (consistent with general Index Controller community knowledge, not independently re-verified live in this project) |
-| Charged / charge terminated (on charger, battery full) | White | The live `battery` debug shell command reported `state: charge term` while the controller was connected and at `state of charge: 100%`; general community knowledge holds this state displays white | 50% (state confirmed live via telemetry; the *color* for this state was not independently visually reconfirmed in this specific project — see note below) |
+| Charging (connected to USB, battery below full) | Orange | Inferred from firmware log strings (`" PM -> charging\n"`, `"charge term"` etc. — see `docs/16_charging_led_research.md`) and general Index Controller knowledge; **not independently visually confirmed during this project's live testing** | 50% (consistent with general knowledge, not independently re-verified live in this project) |
+| Charged / charge terminated (on charger, battery full) | White | The live `battery` debug shell command reported `state: charge term` while connected and at 100% charge; general knowledge holds this state displays white | 50% (state confirmed live via telemetry; the *color* not independently reconfirmed visually) |
+| No connection to PC | Believed to be off, or a distinct idle state | Reported by the user from direct experience; not investigated in this project's firmware analysis yet | Unconfirmed by this project (user-reported) |
+| Connecting to PC | Blue (solid, believed) | Reported by the user from direct experience | Unconfirmed by this project (user-reported) |
+| Pairing mode | Blue, blinking | Reported by the user from direct experience | Unconfirmed by this project (user-reported) |
+| Error / low battery (if distinct) | Possibly red — the user listed red among the "for sure" colors, but did not specify which state it maps to | Reported by the user from direct experience | Unconfirmed by this project (user-reported), state mapping unknown |
 | Boot self-test | Multiple colors, cycling | Directly observed by the human tester immediately after two separate firmware flashes ("during the powerup, it did cycle through a few colors") | 100% (directly observed, twice) |
 | Forced black (patched firmware) | Off | Directly observed by the human tester after applying the Layer-1 code patch (`docs/15_firmware_patching.md`) | 100% (directly observed) |
 
-**Important caveat:** the "orange = charging" and "white = charged" color
-mappings in the table above are **not independently re-verified by direct
-observation within this project** — they are carried over from general
-community/user knowledge about Index Controller behavior stated at the
-start of the investigation. This project's own live testing confirmed the
-*existence* of distinct charging-related device states (via telemetry: the
-`battery` command's `state:` field, and firmware log strings referencing
+**The user has directly confirmed the full known color set is: green, red,
+blue, white, orange** ("The for sure colors are green red blue white
+orange"). This is the strongest available evidence on the *palette*, even
+though several state-to-color mappings above remain unconfirmed by this
+project's own instrumentation. Treat the "How known" / confidence columns
+literally — several rows are user-reported knowledge, not something this
+project's firmware analysis has independently traced or visually verified.
+
+**Important caveat (unchanged from before):** the "orange = charging" and
+"white = charged" mappings are carried over from general community/user
+knowledge, not independently re-verified by direct observation within this
+project. This project's own live testing confirmed the *existence* of
+distinct charging-related device states via telemetry (the `battery`
+command's `state:` field, and firmware log strings referencing
 `"not charging"`, `"pre charging"`, `"fast charging"`, `"charge term"` —
 four distinct textual states) but did not, within the time invested,
 directly watch the physical LED transition through orange and white while
 simultaneously confirming which telemetry state each color corresponded to.
 **This is flagged as important follow-up verification work** — see
 `docs/18_future_work.md`.
+
+## Implication for the connection-state hypothesis (new, see `docs/16_charging_led_research.md`)
+
+Blue being a real, existing state for PC/host connection and pairing is an
+important clue for the open charging-LED research problem
+(`docs/16_charging_led_research.md`): it means the firmware almost
+certainly tracks a **connection-state** concept (no connection / connecting
+/ paired) as something at least partly *separate* from the
+**charging-state** concept (`docs/06_firmware_symbols.md` §6.5's `+0xc`
+enum) this project has been tracing. The user's follow-up feature request
+— disable the LED only while connected to SteamVR, revert to stock
+behavior otherwise — targets this connection-state concept specifically,
+which may be simpler to locate than the charging enum, since it is
+plausibly closer to a binary condition (paired/tracking vs. not) than the
+multi-way charging state machine. See `docs/16_charging_led_research.md`
+"Connection-state hypothesis" for the investigation of this new angle.
 
 ## Known charging-related firmware states (from string evidence)
 

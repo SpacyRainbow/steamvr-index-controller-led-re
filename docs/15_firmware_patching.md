@@ -127,11 +127,17 @@ document with the observed outcome (and, ideally, photographic evidence —
 `docs/18_future_work.md` Priority 2).
 
 **Motivation:** a natural follow-up question to the proven black patch is
-whether the same technique can produce a specific *visible* color — in
-particular, a color the controller's normal policy states don't produce
-(`docs/09_led_policy.md` lists green/orange/white as the only observed
-states), which would be an even more legible demonstration than "off" for
-an observer unfamiliar with the project.
+whether the same technique can produce a specific *visible* color, as an
+even more legible demonstration than "off" for an observer unfamiliar with
+the project. **Correction:** this patch was originally motivated as
+producing "a color the controller never normally shows" — this was wrong.
+The user subsequently confirmed blue is an existing, normal state (used
+for USB/host connection and pairing indication, `docs/09_led_policy.md`).
+The patch and its underlying mechanism are unaffected by this correction —
+it's still a real, working (pending live verification) demonstration of
+forcing a specific solid color via software — but it does not demonstrate
+a color outside the controller's existing palette. See
+`docs/14_failed_attempts.md` for this correction preserved in full.
 
 **What it changes:** the same 2-byte instruction at file offset `0xBC20`
 as Patch B, but replaced with `movs r4, #<value>` (Thumb-1 encoding

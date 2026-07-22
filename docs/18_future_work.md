@@ -105,22 +105,44 @@ well enough to know *what kind* of answer to look for (a shared RTOS
 variable/dispatch mechanism); finding the exact location is a matter of
 applying the right technique, not an open-ended unknown.
 
+**A third session narrowed this further**: prompted by the user's
+correction that blue is a real connection/pairing state (not an unused
+color — `docs/14_failed_attempts.md`), investigated whether a
+"connected to host" condition might be more tractable than the charging
+enum. Found that a nearby struct (`0x20003878`, only 20 bytes from the PM
+struct's `0x2000378c`) is touched by a single very large function
+(`0x43c1a4`) reaching offsets beyond `+0x1000` — strong evidence that the
+PM/charging state and the pairing/mode state are not separate structs at
+all, but different offsets within **one large, shared device-state block**
+spanning multiple kilobytes. See `docs/16_charging_led_research.md`
+"Connection-state hypothesis" for full detail. This did not find the LED
+connection either, but it reframes the mapping task: rather than treating
+"find the PM struct's reader" and "find the connection-state struct's
+reader" as two separate problems, they may be the same problem — map the
+one large struct once.
+
 **Recommended approach, in order:**
 1. Live USB traffic capture (`usbmon` or a hardware USB tap) during a real
    charging-state transition on the physical device, correlated with
    directly observed/photographed LED color. This sidesteps static analysis
    entirely by providing ground-truth data to work backward from.
-2. Investigate the generic dispatch mechanism itself (see
+2. **Map the large shared device-state block** rooted around
+   `0x20003878`/`0x2000378c` (`docs/16_charging_led_research.md`
+   "Connection-state hypothesis"), starting from the big initialization
+   function at `0x43c1a4` (which touches many offsets across it) to build
+   out a fuller offset map, rather than continuing to investigate each
+   subsystem's struct as if separate.
+3. Investigate the generic dispatch mechanism itself (see
    `docs/16_charging_led_research.md` "Current recommendation" item 2) —
    now believed to be the actual blocker shared by both the LED and
    power-management investigations, rather than chasing either subsystem
    individually.
-3. Ghidra data-flow analysis starting from the power-management struct's
-   now-known address (`0x2000378c`) and field offsets
+4. Ghidra data-flow analysis starting from the power-management struct's
+   known address (`0x2000378c`) and field offsets
    (`docs/06_firmware_symbols.md` §6.5) — no code was found that *reads*
    the main state enum at `+0xc`; finding that reader is the most direct
    remaining lead.
-4. If hardware access allows it, an SWD/JTAG debug probe on the nRF52840
+5. If hardware access allows it, an SWD/JTAG debug probe on the nRF52840
    for live memory/register inspection — the most direct method, not
    attempted in this project due to lack of the necessary probe hardware.
 

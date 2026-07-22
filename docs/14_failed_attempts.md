@@ -6,6 +6,57 @@ tried, why it seemed reasonable at the time, why it failed, what was
 learned, and whether it is worth retrying (with different circumstances) in
 the future.
 
+## Corrected assumptions
+
+Not every entry below is a dead *technique* — some are assumptions this
+project stated confidently and got wrong. Preserved for the same reason:
+so nobody re-derives the same wrong conclusion, and so it's clear where a
+correction came from.
+
+### "Blue is a color the controller never normally shows" — WRONG
+
+**Claimed:** Patch C (`docs/15_firmware_patching.md`,
+`scripts/patch_led_solid_color.py`) was originally motivated and
+documented as producing "a color the controller's normal policy states
+don't produce," listing green/orange/white as the complete known palette.
+**Corrected by:** the user, from direct first-hand experience with Index
+Controller behavior: blue (solid and blinking) is a real, normal LED
+state, used for USB/host connection status and pairing-mode indication.
+The user additionally confirmed the full known color palette is green,
+red, blue, white, orange — red was not previously documented anywhere in
+this project at all.
+**Why the project got this wrong:** the "known states" table in
+`docs/09_led_policy.md` was built entirely from (a) this project's own
+direct visual observation, which only ever saw green (normal use) and the
+patched black, and (b) general secondhand knowledge about
+charging/charged colors stated at the very start of the investigation.
+Connection/pairing states were never in scope for what had been directly
+observed or researched, so their existence (and blue's role in them) simply
+wasn't in the document to be wrong about — the actual error was
+overgeneralizing "the states we've looked into" into "the complete
+palette," stated in `scripts/patch_led_solid_color.py`'s docstring as a
+motivating claim ("a color this controller's normal policy states are not
+known to ever produce") without the hedge that only 2-3 states had ever
+actually been investigated.
+**Impact:** Patch C's underlying mechanism and expected behavior are
+**unaffected** — it still forces a specific solid color via the proven
+technique, and is still useful as a demonstration. Only the framing of
+*why* it was interesting (a "novel" color) was wrong; it's now understood
+as reproducing an existing state (whatever blue's exact role is) via an
+unconditional software patch instead, which is arguably still a valid
+demonstration (forcing a real state on permanently, regardless of what the
+policy would otherwise choose) but not the originally-claimed one.
+**Fixed in:** `docs/09_led_policy.md` (full corrected state/color table),
+`docs/15_firmware_patching.md`, `scripts/patch_led_solid_color.py`
+docstring.
+**Lesson:** when a document lists "known states" or "known colors" as if
+complete, make the completeness caveat explicit and prominent (e.g. "the
+only states we have directly investigated," not just "known states") —
+this project generally does this well, but Patch C's motivating claim
+compressed a longer, properly-hedged statement in `docs/09_led_policy.md`
+into a bare assertion in a different document's docstring, and the hedge
+was lost in that compression.
+
 ## Research-direction dead ends
 
 ### DJm00n/ControllersInfo has no Valve entry

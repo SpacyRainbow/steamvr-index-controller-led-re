@@ -76,6 +76,24 @@ to run these.
   each function's 19–20 unrelated callers). See
   `../../docs/14_failed_attempts.md`.
 
+- **`09_usb_pairing_string_xrefs.java`** — investigated the USB-status
+  ("enumerated"/"power good") and a "pairing" string match, as part of the
+  connection-state hypothesis (`../../docs/16_charging_led_research.md`).
+  Found the USB-status strings have the same recurring
+  zero-cross-references symptom; found the "pairing" match was a
+  boot-time mode-announcement function, not live pairing-state logic.
+
+- **`10_mode_announce_fn_decompile.java`** — full decompilation of that
+  mode-announcement function, revealing its struct base address
+  (`0x20003878`) sits only 20 bytes from the already-known PM struct base
+  (`0x2000378c`).
+
+- **`11_shared_struct_investigation.java`** — follows references to
+  `0x20003878`, finding a single large initialization function
+  (`0x43c1a4`) touching struct offsets beyond `+0x1000` — the evidence
+  behind the "one large shared device-state block" hypothesis in
+  `../../docs/16_charging_led_research.md`.
+
 ## Output files
 
 - **`wrapper_decompile.c`** — cleaned, annotated decompilation of the

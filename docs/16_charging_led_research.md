@@ -225,6 +225,46 @@ concrete facts above (struct address, field offsets, one ruled-out lead,
 one corrected tool) and the reframed hypothesis (a generic dispatch
 mechanism, not an LED-specific one) — not in a working patch.
 
+## Connection-state hypothesis (new angle, also inconclusive)
+
+Prompted by the user's observation that blue is a real, existing state for
+USB/host-connection and pairing status (correcting an earlier wrong
+assumption — see `docs/14_failed_attempts.md`), and the follow-up request
+to explore disabling the LED specifically while connected to SteamVR
+(reverting to stock behavior otherwise), a third investigative thread was
+opened: is a "connected to host" condition more tractable to locate than
+the charging enum?
+
+**What was tried:** the live `battery` debug shell command's `usb:` status
+line (`enumerated: yes, power good: yes`) was traced back to its source
+strings in the firmware, which — consistent with the recurring pattern
+above — had no findable code references via Ghidra's reference manager,
+and sat in another large Ghidra-unbounded code region. A separate,
+initially promising lead (a "pairing" string match) turned out to be part
+of the config key name `pairing_button_press_ms`, not pairing-state LED
+logic, and traced to a one-time boot-time mode-announcement function
+(prints `"Mode: CONTROLLER"` vs. a lab/test-mode string) — not a live
+connection-state tracker.
+
+**What was found:** that mode-announcement function's struct base pointer,
+`0x20003878`, is only 20 bytes away from the already-known PM struct base
+(`0x2000378c`, §6.5 above). Searching for other references to
+`0x20003878` found one very large, complex function (`0x43c1a4`) that
+touches struct offsets well beyond `+0x1000` — far larger than a small,
+dedicated struct. **This strongly suggests the PM/charging struct and the
+mode/pairing struct are not actually separate structures, but different
+offsets within one large, shared device-state block** spanning multiple
+kilobytes, likely encompassing many subsystems' state (battery, USB,
+pairing, and plausibly LED policy) together.
+
+**Status:** this reframes the problem again, but does not solve it.
+Properly mapping a structure of this size (identifying which of its many
+offsets correspond to which subsystem, and specifically which one the LED
+policy reads) is a substantially larger undertaking than anything
+attempted so far in this project, and was not completed in this session.
+This is recorded as a genuine, promising new lead rather than a dead end
+— see `docs/18_future_work.md` for the specific recommended next step.
+
 ## Tooling used, and what it does/doesn't help with
 
 A full headless Ghidra 12.1.2 installation was set up specifically to

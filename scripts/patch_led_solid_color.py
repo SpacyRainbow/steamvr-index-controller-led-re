@@ -30,9 +30,13 @@ docs/18_future_work.md for that harder, not-yet-designed follow-on patch).
 Usage: python3 patch_led_solid_color.py <blue_intensity 0-255>
   0   = black (identical patch to patch_led_black.py; use that script,
         this one is for a nonzero build)
-  255 = maximum-intensity pure blue -- a color this controller's normal
-        policy states (green=ready, orange=charging, white=charged --
-        docs/09_led_policy.md) are not known to ever produce.
+  255 = maximum-intensity pure blue. NOTE: blue is actually one of the
+        controller's normal existing colors (used for USB/host connection
+        and pairing status per docs/09_led_policy.md) -- an earlier version
+        of this docstring incorrectly claimed it was a color the
+        controller never shows. That claim is corrected in
+        docs/14_failed_attempts.md; it doesn't affect whether this patch
+        works, only the "novel color" framing of why it was chosen.
 """
 import os
 import struct

@@ -379,9 +379,9 @@ updates are driven by a dispatched message read by a separate
 handler/task, rather than a direct call, there is no direct call for any
 of these techniques to find — the absence isn't a tooling gap, it's
 consistent with the actual mechanism being something else entirely. Four
-independent tools now agree on the negative result
-([`docs/14_failed_attempts.md`](14_failed_attempts.md) "Methods attempted to find Layer 3's
-callers"), which upgrades this from "one tool's blind spot" to "this
+independent tools now agree on the negative result (see "Methods attempted
+to find Layer 3's callers, and why each failed" above), which upgrades
+this from "one tool's blind spot" to "this
 firmware genuinely does not connect these functions via a direct call,
 under any technique tried."
 

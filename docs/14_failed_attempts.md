@@ -429,6 +429,14 @@ to click through the one-time setup dialog once (it should not reappear
 on subsequent launches) — then this becomes a fast, repeatable technique
 for observing controller behavior under real SteamVR management.
 
+**Update — retry succeeded:** in a later session, with the user physically
+present and home, the same launch command was retried. The dialog
+appeared once, the user clicked through it, and it did not reappear —
+confirming the prediction above. `vrserver` reached the controller this
+time (`lighthouse: Lighthouse VrController HID opened`). Result and
+analysis: [`docs/16_charging_led_research.md`](16_charging_led_research.md) "Live empirical test:
+connecting to real SteamVR does not visibly change the LED."
+
 ### Ghidra headless launcher rejects a technically-correct Java version
 
 **Tried:** extracted a `java-21-openjdk-headless` RPM locally (no root) and

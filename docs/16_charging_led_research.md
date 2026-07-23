@@ -265,6 +265,49 @@ attempted so far in this project, and was not completed in this session.
 This is recorded as a genuine, promising new lead rather than a dead end
 — see [`docs/18_future_work.md`](18_future_work.md) for the specific recommended next step.
 
+### Live empirical test: connecting to real SteamVR does not visibly change the LED
+
+The SteamVR-launch attempt documented as blocked in
+[`docs/14_failed_attempts.md`](14_failed_attempts.md) ("Launching SteamVR to empirically observe
+connection-state behavior") was retried in a later session with the human
+tester physically present to click through the one-time privilege dialog.
+This time SteamVR reached the controller: `vrserver`'s log
+(`~/.local/share/Steam/logs/vrserver.txt`) shows `lighthouse: Attempting
+HID Open VrController: LHR-XXXXXXXX` followed by `lighthouse: Lighthouse
+VrController HID opened` — a real, confirmed connection event, not a
+stalled attempt.
+
+**Result:** the human tester visually confirmed the LED remained **solid
+green — no visible change** at the moment of connection, or in the
+following minutes with SteamVR still connected. The debug shell's `power
+get` (`PM: level 0`) and `battery`/`usb:` telemetry also showed no change
+from the documented baseline values in [`docs/11_hid_commands.md`](11_hid_commands.md), for
+whatever that's worth given those specific fields were never confirmed to
+be sensitive to this event in the first place.
+
+**Why this matters:** it directly narrows the premise behind the
+"disable LED while connected to SteamVR" feature request that motivated
+this whole research thread. The controller's LED apparently does **not**
+carry a distinct "connected to SteamVR" visual state at all — green here
+represents the same "normal operation" state whether or not SteamVR
+happens to be attached. That's consistent with (but doesn't prove) the
+idea that connection-status LED behavior (blue, per the corrected
+palette) is specific to *pairing/enumeration* moments rather than an
+ongoing "is SteamVR currently using this controller" indicator — i.e., a
+selective patch keyed on "connected to SteamVR" may not correspond to any
+existing firmware-side condition at all, and might need to be
+**introduced** (e.g., patching in a genuinely new check against some
+already-located connection-status field) rather than **located** as an
+existing behavior to selectively suppress.
+
+**Not yet tried:** a longer observation window (this was checked shortly
+after connection, not across a full VR session with headset/room-setup
+interaction, which this test machine cannot currently do without a
+headset), and comparing against the *disconnection* half of the same
+event (unplugging while SteamVR still expects the controller). Both
+remain open if a future session wants to chase this specific angle
+further; see [`docs/18_future_work.md`](18_future_work.md).
+
 ## Multi-tool sweep session: a reader of `+0xc` found, and a concrete dispatch-mechanism hypothesis
 
 Prompted by a deliberate step back to ask "what other tools would a mature

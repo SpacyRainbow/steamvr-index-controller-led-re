@@ -9,6 +9,15 @@
 # tools/ghidra_setup.md for the more thorough Ghidra-based alternative
 # used for deeper analysis).
 #
+# angr and unicorn are required only by
+# research/decompiler_notes/12_angr_literal_pool_sweep.py and
+# 13_unicorn_state_handler_sweep.py respectively (the "multi-tool sweep"
+# session, docs/16_charging_led_research.md) -- not needed for anything
+# else in this repository, and heavier installs than the rest of this
+# file, so keep them in mind if disk space or install time matters.
+#
 # Install with: pip install -r requirements.txt
 
 capstone>=5.0
+angr>=9.3
+unicorn>=2.1

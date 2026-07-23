@@ -170,9 +170,13 @@ power-management function ([`docs/16_charging_led_research.md`](16_charging_led_
 power-management task lead"), all of which load the same address.
 
 **Base address (RAM, not flash): `0x2000378c`.** Confirmed via four
-independent functions' literal pool operands, and via 14 further raw
-references to this exact address elsewhere in the firmware image
-([`docs/16_charging_led_research.md`](16_charging_led_research.md) follow-up session).
+independent functions' literal pool operands, and via 18 further raw
+literal-pool references to this exact base address elsewhere in the
+firmware image (14 found by the original Ghidra-based search, 4 more
+found by a later, wider-range angr-based re-scan that also checked
+non-zero offsets — [`docs/16_charging_led_research.md`](16_charging_led_research.md) "Multi-tool
+sweep session"), plus one further literal-pool reference to `+0x2c`
+specifically.
 
 Known field offsets, from the functions examined so far — **this is not
 a claimed-complete struct layout**, only the fields actually observed in
@@ -187,11 +191,20 @@ use:
 | `+0x24` | 4 bytes (read as an integer, multiplied by 1000) | Read by code that then registers a software timer ([`docs/16_charging_led_research.md`](16_charging_led_research.md) "The `0x414dbc`/`0x414e38`... lead" — this specific lead was a dead end for LED purposes, but the field itself is real). Plausibly a duration in seconds. |
 | `+0x28` | 1 byte | Checked as a boolean-like condition by a function with (as of this writing) zero statically-findable direct callers — see [`docs/16_charging_led_research.md`](16_charging_led_research.md). |
 
-**Not yet found:** any code that *reads* `+0xc` (the main state enum) —
-every reference located so far either writes it or is one of the four
-originally-identified PM state-transition functions themselves. Finding
-a reader of this specific field is the most direct remaining path to the
-open question in [`docs/16_charging_led_research.md`](16_charging_led_research.md).
+**Update — a reader of `+0xc` has now been found.** `sub_422f21` (function
+starting at `0x422f21`, found via a broader angr-based literal-pool scan —
+[`docs/16_charging_led_research.md`](16_charging_led_research.md) "Multi-tool sweep session")
+reads `+0xc` twice, branches on specific values (`0`, `1`, `2`, and
+separately `5`), and — for exactly those five values — writes `+0xc = 3`
+before calling into what a subsequent investigation identified as a likely
+typed message/event-dispatch mechanism, not a direct call to any known LED
+function. Full detail, including an emulated (Unicorn) confirmation of
+this exact branching behavior, in
+[`docs/16_charging_led_research.md`](16_charging_led_research.md).
+This does not by itself locate the LED connection — see that document for
+why a message-passing mechanism would explain the continued absence of any
+direct-call path to the LED subsystem, and what finding the dispatch table
+would take.
 
 ## 6.6 What is NOT yet mapped
 

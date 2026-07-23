@@ -265,6 +265,189 @@ attempted so far in this project, and was not completed in this session.
 This is recorded as a genuine, promising new lead rather than a dead end
 — see [`docs/18_future_work.md`](18_future_work.md) for the specific recommended next step.
 
+## Multi-tool sweep session: a reader of `+0xc` found, and a concrete dispatch-mechanism hypothesis
+
+Prompted by a deliberate step back to ask "what other tools would a mature
+RE project already have tried" (independent of any specific new lead), this
+session ran the same open question — what connects the PM struct's state
+enum to a consumer like the LED policy — through several tools never
+previously used in this project: **angr** (CFG recovery + literal-pool/
+call-graph analysis), **Unicorn Engine** (direct emulation of one function,
+to empirically verify a static reading rather than trust it by eye), and
+**radare2** revisited on this firmware with a narrower technique than its
+earlier, largely-abandoned attempt ([`tools/radare2_setup.md`](../tools/radare2_setup.md)), plus a
+lightweight DIY version-diff across this project's own locally-held
+firmware builds. IDA Free and Binary Ninja were deliberately not attempted
+— both require creating a vendor account through a login-gated download,
+which isn't appropriate to do on the user's behalf without them present;
+they remain valid untried options for a future session.
+
+### A reader of `+0xc` — the field previously documented as having none
+
+A wider literal-pool scan (raw 4-byte little-endian search for the struct
+base address across the *entire* offset range `+0x0`..`+0x2f`, not just
+`+0x0` as the original Ghidra-era search checked) found 5 reference sites
+the earlier investigation had missed: four more `+0x0` (base-pointer)
+references at `0x422fa8`, `0x423078`, `0x423160`, `0x423218`, and one
+reference to `+0x2c` specifically at `0x4376d4`. This is itself a small
+methodological finding worth naming: the original raw-byte search
+([`research/decompiler_notes/07_pm_reference_investigation.java`](../research/decompiler_notes/07_pm_reference_investigation.java)) was
+narrower than it looked — it searched for the base pointer only, at a
+fixed list of addresses, not a systematic scan of the full plausible
+offset range. A systematic scan found more.
+
+The site at `0x423218` sits immediately after a `strb r0, [r4, #0xc]` —
+a **write to the state enum** — inside a function angr's CFG recovery
+resolves to `sub_422f21` (entry `0x422f21`). Full disassembly of that
+function shows:
+
+```
+push {r4, lr}
+ldr  r4, [pc, #imm]        ; r4 = &PM_struct (0x2000378c)
+ldr  r0, [r4, #0xc]        ; r0 = state enum
+cbz  r0, do_first_call
+cmp  r0, #1
+beq  do_first_call
+cmp  r0, #2
+bne  skip_first_call
+do_first_call:
+  movs r0, #1
+  bl   0x43c055             ; builds a small tagged stack buffer, calls 0x41f56d
+skip_first_call:
+ldr  r0, [r4, #0xc]        ; re-read state enum
+cbz  r0, do_transition
+cmp  r0, #1
+beq  do_transition
+cmp  r0, #2
+beq  do_transition
+cmp  r0, #5
+bne  early_exit             ; state not in {0,1,2,5}: nothing happens
+do_transition:
+  <build/log strings via 0x42ce91/0x42ce7b>
+  movs r0, #3
+  str  r0, [r4, #0xc]       ; STATE TRANSITION: write 3
+  bl   0x43c249
+  bl   0x43c079
+  bl   0x43ac89              ; branches further calls on r0 (return value)
+  ... (conditional call sequences)
+  bl   0x43ad05
+  bl   0x415649
+  bl   0x415621
+  pop.w {r4, lr}
+  b.w  0x4156e9               ; tail-call: builds ANOTHER tagged buffer
+                               ; (opcode 0x53), calls 0x4153e5
+early_exit:
+  pop {r4, pc}
+```
+
+This is the first time this project has located code that both *reads*
+and *acts on* the PM state enum with real branching semantics — states
+`{0, 1, 2, 5}` reach the transition path (which sets the enum to `3` and
+is therefore an idempotent "already transitioned" guard against re-firing:
+once the state is `3`, a later call to this same function takes the
+early-exit path), while `{3, 4, 6, ...}` do nothing.
+
+**Empirically verified, not just read by eye:** a Unicorn Engine harness
+([`research/decompiler_notes/13_unicorn_state_handler_sweep.py`](../research/decompiler_notes/13_unicorn_state_handler_sweep.py)) loaded
+the real firmware bytes, statically NOP-patched out every `bl` inside this
+function's body (so only its own branching logic executes, without
+needing to emulate everything it calls), and swept the initial value of
+`+0xc` from 0 to 7. Result matched the disassembly reading exactly for
+every value: `{0, 1, 2, 5}` → struct`+0xc` written to `3`, execution
+reaches the `0x4156e8` tail; `{3, 4, 6, 7}` → early exit, no write. This
+is the first empirical (executed, not just statically reasoned about)
+confirmation obtained in this project without real hardware.
+
+### A concrete hypothesis for *why* no direct caller has ever been found: message/event dispatch, not function calls
+
+The two functions `sub_422f21` calls into when it takes a "real" branch
+(`0x43c055`/`0x43c079` on the first check, and the `0x4156e8` tail on the
+second) share a distinctive pattern: each builds a small buffer on the
+stack, writes a specific one- or two-byte "opcode" into it (`0x40`, `0x2`,
+`0x53` observed so far), sets a small length, and calls a small number of
+shared functions (`0x41f56d`, `0x4153e5`) to do something with it. This is
+the classic shape of a **typed message or event post** — "opcode + payload,
+handed to a generic dispatcher" — not a direct function call to a specific
+handler.
+
+**This would explain, architecturally, why every static call-graph
+technique tried in this project — Ghidra's reference manager, the
+project's own exhaustive `BL`-encoding search, a raw stored-pointer search,
+angr's CFG recovery, and (this session) radare2's independent analyzer —
+has found zero direct callers for the LED Layer-3 functions.** If LED
+updates are driven by a dispatched message read by a separate
+handler/task, rather than a direct call, there is no direct call for any
+of these techniques to find — the absence isn't a tooling gap, it's
+consistent with the actual mechanism being something else entirely. Four
+independent tools now agree on the negative result
+([`docs/14_failed_attempts.md`](14_failed_attempts.md) "Methods attempted to find Layer 3's
+callers"), which upgrades this from "one tool's blind spot" to "this
+firmware genuinely does not connect these functions via a direct call,
+under any technique tried."
+
+**This is a hypothesis, not a confirmed finding.** It has not been proven
+that the LED subsystem is on the *receiving* end of this specific dispatch
+mechanism — only that the PM state-transition code demonstrably uses
+*some* form of tagged message dispatch for at least some of its own
+side effects. Finding and decoding what `0x41f56d`/`0x4153e5` actually do
+with the opcode (a jump table? a linked list of registered handlers? a
+fixed RTOS message queue post?) is the concrete next step — see
+[`docs/18_future_work.md`](18_future_work.md), which has been updated to reflect this as the new
+top-priority approach for this research thread, ahead of the "map the
+whole shared struct" recommendation from the previous session.
+
+### radare2, revisited with a narrower technique
+
+`radare2` was tried on this exact firmware early in the project and
+largely abandoned for it — `aaa` (radare2's blanket whole-binary
+auto-analysis) produced sparse, low-confidence function boundaries and
+missed cross-references later confirmed to exist once Ghidra was set up
+([`tools/radare2_setup.md`](../tools/radare2_setup.md), "Known limitation encountered"). This
+session revisited it with a narrower technique instead of retrying `aaa`
+wholesale: explicitly defining only the functions of interest (`af @
+<addr>`) and using radare2's direct reference-search command (`/r
+<addr>`, which scans for actual call/reference encodings to a specific
+target rather than relying on `aaa`'s general auto-analysis to have
+already built a complete xref database). This targeted approach worked
+cleanly this time — a `pdf` sanity check against the known LED wrapper
+function matched Ghidra's disassembly exactly, including the same string
+reference (`led_driver_lp5562.c`).
+
+With that confidence, `/r` was run against the three LED Layer-3 function
+addresses and the PM struct base address, and found **zero references**
+to any of them — corroborating, via a completely different codebase and
+analysis approach than either Ghidra or angr, the same negative result.
+Four independent techniques (Ghidra, this project's own `BL`-search, angr,
+radare2) now agree. `/r` did surface one small, unchased lead: a call to
+the LED "off-path function" (`0x41e7d8`) from `0x41da32`, inside the same
+Ghidra-unbounded gap region that contains the Layer-3 functions themselves
+— not investigated further this session (see [`docs/18_future_work.md`](18_future_work.md)).
+
+### Version-diff sanity check across this project's own local firmware builds
+
+Rather than install Diaphora or BinDiff (heavier tools, not worth the setup
+risk for a single targeted check), a small Python script compared the raw
+bytes of `sub_422f21`'s opcode signature (`ldr r0, [r4, #0xc]; cbz r0,
+...`) and the PM struct's literal-pool footprint across every firmware
+build already held locally by this project
+([`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt)):
+
+- The **`ev` variant (2023-10-13)** — a completely separate build from the
+  primary 2023-09-02 analysis target — contains the *exact same* struct
+  base address (`0x2000378c`), the *exact same* 18 literal-pool reference
+  offsets, and `sub_422f21`'s opcode signature at the *identical* file
+  offset. This is a genuine cross-build confirmation that the finding
+  isn't an artifact specific to one single firmware file.
+- Both **2019-era builds** (`20190621`, `20190712`) do **not** contain the
+  literal `0x2000378c` (expected — a much older build almost certainly has
+  a different RAM layout), but **do** contain the same `ldr r0, [r4,
+  #0xc]; cbz` opcode signature once each, at their own (different)
+  offsets — suggesting this state-handling function, or something
+  structurally identical to it, has existed in this firmware's codebase
+  for at least the ~4 years spanning these builds. Not traced further
+  (would require redoing the base-address/struct-offset analysis
+  per-build) — noted as a future-work item, not chased this session.
+
 ## Tooling used, and what it does/doesn't help with
 
 A full headless Ghidra 12.1.2 installation was set up specifically to
@@ -291,32 +474,49 @@ the RTOS shared-state connection. Both would likely benefit from:
 ## Current recommendation
 
 See [`docs/18_future_work.md`](18_future_work.md) for the prioritized next steps. In summary,
-the most promising next actions:
+the most promising next actions, updated after the multi-tool sweep
+session above:
 
-1. **Live USB traffic capture** during an actual charging-state transition
+1. **Decode the message/event dispatch mechanism** — now the top
+   recommendation, superseding the more general "understand the generic
+   dispatch mechanism" framing from the earlier session. This session
+   narrowed it from a vague hypothesis to concrete targets: `0x41f56d` and
+   `0x4153e5`, called with small tagged stack buffers (opcodes observed so
+   far: `0x40`, `0x2`, `0x53`) by `sub_422f21`'s state-transition path.
+   Tracing what these two functions do with their opcode argument (a jump
+   table indexed by opcode? a linked list of registered handlers? a
+   fixed-size RTOS message queue post?) is now the single most direct
+   remaining path — if the LED subsystem is also invoked through this same
+   mechanism (unconfirmed), finding the dispatch table would likely reveal
+   it directly, the same way `sub_422f21`'s own struct-literal reference
+   revealed the state handler.
+2. **Live USB traffic capture** during an actual charging-state transition
    on the real device (requires either a hardware USB tap or `usbmon` on
    the host — the project's environment had host-level `usbmon` available
    in principle but this was not exercised). A capture spanning a real
    plug-in/charge-termination event, correlated with the physical LED
    color, would let the researcher work backward from confirmed telemetry
    rather than forward from an incomplete static trace.
-2. **Understand the generic dispatch mechanism directly**, rather than
-   continuing to chase individual LED- or PM-specific leads. The follow-up
-   session above found that *multiple, unrelated* subsystems (LED state
-   application, power-management flag setters) share the identical
-   "invoked with zero statically-findable direct callers" symptom. This
-   strongly suggests one shared, firmware-wide dispatch/event framework is
-   responsible, not something specific to either subsystem. Finding and
-   understanding *that* mechanism once — most likely by picking one of its
-   simplest-looking victims and tracing every reference to *it*, or by
-   searching for whatever data structure such a framework would need
-   (a table of {condition, handler} pairs, a priority queue, or similar) —
-   would likely unlock this question and any other question with the same
-   symptom, rather than requiring a fresh investigation per function.
-3. **Data-flow analysis in Ghidra** starting from the power-management
+3. **Hardware SWD debugging**, if hardware modification becomes an option
+   in a future session: the nRF52840 exposes SWD, and OpenOCD/a debug
+   probe would allow a hardware watchpoint directly on
+   `0x2000378c`+`0xc`, which would show — with certainty, live, on real
+   hardware — every piece of code that touches it, sidestepping static
+   analysis (and its shared blind spot around indirect/dispatched calls)
+   entirely. Not pursued this session (hardware modification explicitly
+   off the table for now), but this remains the most direct way to close
+   this question if it ever becomes available.
+4. **Data-flow analysis in Ghidra** starting from the power-management
    struct's now-known base address (`0x2000378c`) and the field offsets
    identified in the follow-up session above (`+0xc`, `+0xd`, `+0x15`,
    `+0x16`, `+0x24`, `+0x28`) — a raw-address search (as done for
    `0x2000378c` itself) is a cheap first pass; true data-flow/value-set
    analysis through Ghidra's P-code APIs is the more thorough follow-up if
    the raw search doesn't find the reader directly.
+5. **A second-opinion decompiler** (IDA Free or Binary Ninja) on
+   `0x41f56d`/`0x4153e5` specifically — not attempted this session since
+   both require a login-gated vendor download not appropriate to do
+   autonomously, but worth trying if a human is available to install one:
+   a different decompiler's own struct/switch-table inference sometimes
+   resolves exactly the kind of indirect dispatch this project keeps
+   running into.

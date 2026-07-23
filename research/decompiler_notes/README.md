@@ -1,9 +1,17 @@
 # research/decompiler_notes/
 
-Ghidra headless analysis scripts (Java `GhidraScript` subclasses) and their
-raw output, preserved as primary evidence for the claims made in
-[`../../docs/06_firmware_symbols.md`](../../docs/06_firmware_symbols.md), [`../../docs/07_led_architecture.md`](../../docs/07_led_architecture.md),
-and [`../../docs/16_charging_led_research.md`](../../docs/16_charging_led_research.md).
+Analysis scripts and their raw output, preserved as primary evidence for
+the claims made in [`../../docs/06_firmware_symbols.md`](../../docs/06_firmware_symbols.md), [`../../docs/07_led_architecture.md`](../../docs/07_led_architecture.md),
+and [`../../docs/16_charging_led_research.md`](../../docs/16_charging_led_research.md). Originally, and still mostly,
+Ghidra headless scripts (Java `GhidraScript` subclasses, scripts 01-11
+below) — see [`../../tools/ghidra_setup.md`](../../tools/ghidra_setup.md) for how to set up the environment
+needed to run those. A later "multi-tool sweep" session (scripts 12-14)
+added angr, Unicorn Engine, and radare2 to the mix, run because Ghidra's
+reference manager has a confirmed history of missing real cross-references
+in this exact firmware — these live in this directory rather than
+`scripts/` because, like everything else here, they're one-off
+investigation notes hardcoded to specific firmware addresses, not general
+reusable tooling.
 
 These are a representative subset of the scripts actually written during
 the investigation (numbered here in the order that best tells the
@@ -11,9 +19,6 @@ investigation's story, not necessarily the exact original chronological
 order — the original session produced more incremental variants than are
 preserved here; these were selected as the ones that each established a
 genuinely new fact).
-
-See [`../../tools/ghidra_setup.md`](../../tools/ghidra_setup.md) for how to set up the environment needed
-to run these.
 
 ## Scripts
 
@@ -93,6 +98,33 @@ to run these.
   (`0x43c1a4`) touching struct offsets beyond `+0x1000` — the evidence
   behind the "one large shared device-state block" hypothesis in
   [`../../docs/16_charging_led_research.md`](../../docs/16_charging_led_research.md).
+
+- **[`12_angr_literal_pool_sweep.py`](12_angr_literal_pool_sweep.py)** — angr-based second opinion: a
+  systematic literal-pool scan across the PM struct's full plausible
+  offset range (`+0x0`..`+0x2f`, not just `+0x0` as script 07 checked),
+  which found 5 reference sites the earlier search missed, and an
+  independent callgraph-reachability check confirming (again) zero path
+  from any PM-struct-touching function to the LED Layer-3 functions. One
+  of the 5 new sites led directly to `sub_422f21` — see script 13.
+
+- **[`13_unicorn_state_handler_sweep.py`](13_unicorn_state_handler_sweep.py)** — empirically verifies
+  `sub_422f21` (found via script 12), the first located reader of the PM
+  state enum, by actually executing it in Unicorn Engine (with its own
+  `bl` calls NOP-patched out) across a swept range of initial state
+  values. Confirms the disassembly reading exactly: states `{0,1,2,5}`
+  transition the enum to `3`; states `{3,4,6,7}` are a no-op. See
+  [`../../docs/16_charging_led_research.md`](../../docs/16_charging_led_research.md) "Multi-tool sweep session" for
+  the annotated disassembly this validates.
+
+- **[`14_r2_and_version_diff.md`](14_r2_and_version_diff.md)** — radare2 was tried on this exact
+  firmware early in the project and largely abandoned (`aaa` produced poor
+  results, [`../../tools/radare2_setup.md`](../../tools/radare2_setup.md)); this session revisited it with a
+  narrower technique (explicit per-function `af` + direct `/r` reference
+  search instead of blanket `aaa`) and got a clean, usable independent
+  cross-reference check (also zero results, corroborating Ghidra, the
+  project's `BL`-search, and angr). Also includes a DIY version-diff Python
+  snippet confirming `sub_422f21` and the PM struct's exact layout are
+  present, byte-identical, in a second separate firmware build.
 
 ## Output files
 

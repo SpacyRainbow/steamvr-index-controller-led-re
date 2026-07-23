@@ -83,9 +83,10 @@ LED's color, to enable a selective patch (blank LED during normal use,
 preserve charging/charged indication). Full context in
 [`docs/16_charging_led_research.md`](16_charging_led_research.md).
 
-**Difficulty:** High. Static call-graph tracing has been exhausted (three
-independent methods, all failed to find Layer 3's callers — see
-[`docs/14_failed_attempts.md`](14_failed_attempts.md)). A follow-up session made concrete progress
+**Difficulty:** High. Static call-graph tracing has been exhausted (four
+independent tools/methods — Ghidra, the project's own exhaustive `BL`-search,
+angr, and radare2 — all agree: zero direct callers for Layer 3's LED
+functions, see [`docs/14_failed_attempts.md`](14_failed_attempts.md)). A follow-up session made concrete progress
 without closing the question: found the PM state struct's exact RAM
 address (`0x2000378c`) and several more of its field offsets
 ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.5), ruled out one promising-looking lead
@@ -100,10 +101,15 @@ dispatch mechanism is the real obstacle, not something LED-specific. See
 improvement over the current "always off" patch, and was the specific
 follow-up request that motivated this entire line of investigation.
 
-**Likelihood of success:** Moderate (~50%). The architecture is understood
-well enough to know *what kind* of answer to look for (a shared RTOS
-variable/dispatch mechanism); finding the exact location is a matter of
-applying the right technique, not an open-ended unknown.
+**Likelihood of success:** Moderate (~50%, unchanged from the previous
+assessment despite real progress in the fourth session — finding the
+state-transition function narrows *where* to look but has not yet reduced
+the difficulty of decoding an opcode-dispatch mechanism, which is a
+genuinely different and not-yet-attempted kind of analysis). The
+architecture is understood well enough to know *what kind* of answer to
+look for (a message/event dispatch mechanism, now with concrete target
+addresses); finding the exact location is a matter of applying the right
+technique, not an open-ended unknown.
 
 **A third session narrowed this further**: prompted by the user's
 correction that blue is a real connection/pairing state (not an unused
@@ -121,30 +127,58 @@ connection either, but it reframes the mapping task: rather than treating
 reader" as two separate problems, they may be the same problem — map the
 one large struct once.
 
-**Recommended approach, in order:**
-1. Live USB traffic capture (`usbmon` or a hardware USB tap) during a real
+**A fourth session (multi-tool sweep — angr, Unicorn, radare2, plus a DIY
+version-diff) made the most concrete progress yet**, and found the actual
+reader of `+0xc`: `sub_422f21` (`0x422f21`), which reads the state enum,
+transitions it to `3` for input values `{0,1,2,5}` (idempotent — a second
+call while already at `3` is a no-op), and calls into what looks like a
+typed message/event-dispatch mechanism (`0x41f56d`/`0x4153e5`, called with
+small tagged buffers — opcodes `0x40`, `0x2`, `0x53` observed) rather than
+a direct call to any known function. This was verified empirically via
+Unicorn emulation, not just read by eye. **This also strengthens the
+"generic dispatch mechanism" hypothesis from a vague guess into a specific,
+concrete lead with real target addresses to trace** — see
+[`docs/16_charging_led_research.md`](16_charging_led_research.md) "Multi-tool sweep session" for full
+detail, including radare2 independently confirming (a fourth technique,
+after Ghidra, the project's own `BL`-search, and angr) zero direct callers
+for the LED Layer-3 functions, and a version-diff confirming the same
+struct address, offsets, and handler function are present byte-identical
+in a second, separate firmware build (the `ev` variant).
+
+**Recommended approach, in order (revised after the fourth session):**
+1. **Decode the message/event dispatch mechanism** — trace what
+   `0x41f56d` and `0x4153e5` do with their opcode argument (jump table?
+   registered-handler list? RTOS queue post?). This is now the most direct
+   lead: if the LED subsystem receives updates through this same
+   mechanism (unconfirmed), finding the dispatch table would likely reveal
+   it the same way finding `sub_422f21`'s struct-literal reference
+   revealed the state handler itself.
+2. Live USB traffic capture (`usbmon` or a hardware USB tap) during a real
    charging-state transition on the physical device, correlated with
    directly observed/photographed LED color. This sidesteps static analysis
    entirely by providing ground-truth data to work backward from.
-2. **Map the large shared device-state block** rooted around
+3. If hardware modification becomes an option in the future: an SWD/JTAG
+   debug probe on the nRF52840 for a live hardware watchpoint directly on
+   `0x2000378c+0xc` — the most direct method available, explicitly not
+   pursued in the fourth session since hardware modification was ruled out
+   for now.
+4. **Map the large shared device-state block** rooted around
    `0x20003878`/`0x2000378c` ([`docs/16_charging_led_research.md`](16_charging_led_research.md)
    "Connection-state hypothesis"), starting from the big initialization
    function at `0x43c1a4` (which touches many offsets across it) to build
    out a fuller offset map, rather than continuing to investigate each
    subsystem's struct as if separate.
-3. Investigate the generic dispatch mechanism itself (see
-   [`docs/16_charging_led_research.md`](16_charging_led_research.md) "Current recommendation" item 2) —
-   now believed to be the actual blocker shared by both the LED and
-   power-management investigations, rather than chasing either subsystem
-   individually.
-4. Ghidra data-flow analysis starting from the power-management struct's
+5. Ghidra data-flow analysis starting from the power-management struct's
    known address (`0x2000378c`) and field offsets
-   ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.5) — no code was found that *reads*
-   the main state enum at `+0xc`; finding that reader is the most direct
-   remaining lead.
-5. If hardware access allows it, an SWD/JTAG debug probe on the nRF52840
-   for live memory/register inspection — the most direct method, not
-   attempted in this project due to lack of the necessary probe hardware.
+   ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.5) — now partially superseded by item 1
+   finding a concrete reader, but still relevant for the struct's other
+   unexplained fields (`+0xd`, `+0x15`, `+0x16`, `+0x24`, `+0x28`).
+6. A second-opinion decompiler (IDA Free or Binary Ninja) specifically on
+   `0x41f56d`/`0x4153e5` — not attempted in the fourth session (both
+   require a login-gated vendor download, not appropriate to do
+   autonomously), but worth trying if a human sets one up: a different
+   decompiler's switch-table/struct inference sometimes resolves exactly
+   this kind of indirect dispatch.
 
 ## Priority 4 — Photographic and video documentation
 

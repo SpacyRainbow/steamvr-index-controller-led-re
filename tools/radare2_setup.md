@@ -71,3 +71,16 @@ cross-references that were later confirmed to exist (once Ghidra was
 available). This is recorded as an observed limitation for this specific
 firmware/toolchain combination, not a general claim about radare2's
 capabilities.
+
+## Successful retry with a narrower technique
+
+A later session revisited radare2 on this same firmware, but avoided `aaa`
+entirely: explicitly define only the specific functions of interest
+(`af @ <addr>`) and use the direct reference-search command (`/r <addr>`)
+rather than relying on `aaa` to have already built a complete
+cross-reference database across the whole binary. This worked cleanly —
+a `pdf` disassembly of the known LED wrapper function matched Ghidra's
+output exactly, including the same string reference. Used as a fourth
+independent cross-reference check in
+[`../research/decompiler_notes/14_r2_and_version_diff.md`](../research/decompiler_notes/14_r2_and_version_diff.md) — see
+[`../docs/16_charging_led_research.md`](../docs/16_charging_led_research.md) "Multi-tool sweep session".

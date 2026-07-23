@@ -154,9 +154,20 @@ in a second, separate firmware build (the `ev` variant).
    it the same way finding `sub_422f21`'s struct-literal reference
    revealed the state handler itself.
 2. Live USB traffic capture (`usbmon` or a hardware USB tap) during a real
-   charging-state transition on the physical device, correlated with
+   **charging-state transition** on the physical device, correlated with
    directly observed/photographed LED color. This sidesteps static analysis
    entirely by providing ground-truth data to work backward from.
+   **Partially attempted:** a `usbmon` capture around a manual unplug/replug
+   cycle was completed in a later session (
+   [`docs/16_charging_led_research.md`](16_charging_led_research.md) "USB-level capture around a
+   connect/disconnect cycle") — it confirmed clean disconnect/reconnect
+   timing but showed only standard USB enumeration, nothing charging-state
+   specific, and the controller was already fully charged so no real
+   charging *transition* occurred. The original recommendation (capture
+   during an actual not-charging → charging transition) is still open and
+   is now understood to likely need to be paired with the debug shell's own
+   `battery` telemetry polled concurrently, since charging state does not
+   appear to be visible at the USB protocol level at all.
 3. If hardware modification becomes an option in the future: an SWD/JTAG
    debug probe on the nRF52840 for a live hardware watchpoint directly on
    `0x2000378c+0xc` — the most direct method available, explicitly not

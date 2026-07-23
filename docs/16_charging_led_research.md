@@ -308,6 +308,64 @@ event (unplugging while SteamVR still expects the controller). Both
 remain open if a future session wants to chase this specific angle
 further; see [`docs/18_future_work.md`](18_future_work.md).
 
+## USB-level capture around a connect/disconnect cycle (partial result)
+
+With the human tester physically present, a `usbmon` capture
+(`tcpdump -i usbmon1`, loaded via `pkexec modprobe usbmon`) was run on the
+host across a manual unplug/replug of the controller's USB cable — the
+live-capture recommendation from [`docs/18_future_work.md`](18_future_work.md), attempted here
+around a *connection* cycle rather than a true *charging-state* transition
+(see caveat below).
+
+**What was captured, confirmed via both the capture and the kernel's own
+`journalctl -k` log:** a clean disconnect (`USB disconnect, device number
+24`) roughly 5 seconds into the capture, then a clean re-enumeration
+(`new full-speed USB device number 25`, same `idVendor=28de,
+idProduct=2300`) about 10 seconds later. The device address changing
+(24 → 25) is normal Linux USB behavior on reconnect, not evidence of
+anything device-specific.
+
+**What the capture showed:** the reconnection sequence is a standard USB
+control-transfer enumeration (`GET_DESCRIPTOR` chain on endpoint 0) —
+nothing vendor-specific or unusual, and no visible negotiation that would
+correspond to a "charging" or "connection status" handshake. This is
+consistent with (not surprising, in hindsight) how this hardware works:
+charging management reads from the on-board fuel gauge (`bq27421`, over
+I2C) are internal to the device, not part of the USB enumeration protocol
+— so a host-side USB capture, even a clean one, was never going to be
+able to see that logic. It can only see *that* a connection event
+happened, not *what the firmware's charging state machine does* in
+response.
+
+**Confirmed side effect, consistent with already-documented behavior:**
+the Debug interface (and the third-party-visible interface count) reset
+to disabled after the reconnect — `bNumInterfaces` dropped from 4 back to
+3, requiring the `SET_FEATURE` unlock to be resent before the debug shell
+worked again. [`docs/12_debug_interfaces.md`](12_debug_interfaces.md) already documented that debug
+mode doesn't persist across "a firmware reflash or a full power cycle";
+this confirms a plain unplug/replug (no reflash involved) counts as that
+same "full power cycle" case, which hadn't been directly exercised
+before. Debug shell access was restored by resending the unlock.
+
+**An unexplained second cycle, not chased further:** `journalctl -k` also
+showed a second, unprompted disconnect/reconnect about a minute after the
+one requested (device 25 → 26), outside the 50-second capture window and
+not something either the researcher or the human tester intentionally
+triggered. Not investigated — could be a spurious bus event, SteamVR's
+lighthouse driver doing something, or the physical cable connection being
+imperfect; flagged here rather than silently ignored, per this project's
+own citation standards.
+
+**Honest limitation:** the controller was already at 100% state of charge
+during this session (`battery` telemetry, above), so this specific
+plug/unplug cycle could not have captured an actual charge-state
+*transition* (e.g., not-charging → charging) even if USB traffic could
+see one, which the above suggests it can't anyway. The originally
+recommended experiment — capture during a genuine charging-state change,
+correlated with directly observed LED color — remains meaningfully
+different from what was tested here and is still open; see
+[`docs/18_future_work.md`](18_future_work.md).
+
 ## Multi-tool sweep session: a reader of `+0xc` found, and a concrete dispatch-mechanism hypothesis
 
 Prompted by a deliberate step back to ask "what other tools would a mature

@@ -4,7 +4,44 @@ Prioritized roadmap for continuing this project. Each item includes a
 description, difficulty estimate, expected value, likelihood of success,
 and recommended approach.
 
-## Priority 1 — Flash and verify Patch C (forced blue), the first thing to do with hardware access
+## Priority 1 — Resolve the firmware-flashing regression (blocks everything below that needs a real flash)
+
+**Description:** as of this session, `lighthouse_watchman_update` rejects
+**any** file that has gone through this project's recompress/rebuild-footer
+pipeline — including a fresh, hash-verified rebuild of the *already-proven*
+black patch, and even a zero-content-change re-encode — while the
+completely unmodified original firmware still flashes fine. Full
+diagnostic account: [`docs/13_experiments.md`](13_experiments.md) Experiment 9,
+[`docs/14_failed_attempts.md`](14_failed_attempts.md) "Open regressions." This is a new problem, not
+the original (long-fixed) footer-CRC bug, and its root cause is not yet
+known.
+
+**Difficulty:** Unknown — could be a small, findable difference in
+compression parameters, or could require real reverse engineering of the
+update tool's validation logic.
+
+**Expected value:** Very high — this currently blocks **all** live firmware
+patching in this project, including re-verifying that the proven black
+patch still works, not just Patch C below.
+
+**Likelihood of success:** Moderate-to-high. A partial disassembly pass
+already narrowed the search space considerably (the rejection happens in
+a specific, now-located validation function, `fcn.0003e750` in the current
+tool binary) — finishing the job with a proper decompiler should be
+tractable.
+
+**Recommended approach:** set up Ghidra ([`tools/ghidra_setup.md`](../tools/ghidra_setup.md), already
+done once in this project, no root needed) and decompile
+`lighthouse_watchman_update`'s validation function starting from the
+`"Error: Invalid firmware file."` string reference (offset `0x344fa` in
+the build analyzed this session) — Ghidra's clean pseudocode should resolve
+in minutes what raw `objdump`/`radare2` disassembly reading did not finish
+in a reasonable time. Cross-check any hypothesis against the cheap,
+zero-risk zero-content-change re-encode test from Experiment 9 before
+attempting a real hardware flash. Once resolved, re-verify Patch B
+(forced black) still works before trusting Patch C or any future patch.
+
+## Priority 2 — Flash and verify Patch C (forced blue), the first thing to do with hardware access
 
 **Description:** [`scripts/patch_led_solid_color.py`](../scripts/patch_led_solid_color.py) (Patch C,
 [`docs/15_firmware_patching.md`](15_firmware_patching.md) §15.3) has been built and verified as a
@@ -35,7 +72,7 @@ the physical LED, and update [`docs/13_experiments.md`](13_experiments.md) with 
 entry documenting the actual outcome — whatever it is, success or failure.
 Then remove the "UNTESTED" markers in the three locations listed above.
 
-## Priority 2 — Design and build a code-cave patch for two-channel colors (e.g. true purple)
+## Priority 3 — Design and build a code-cave patch for two-channel colors (e.g. true purple)
 
 **Description:** Patch C (Priority 1 above) can only reach pure-blue
 shades, because its single-instruction technique zero-extends an 8-bit
@@ -75,7 +112,7 @@ If safe space is confirmed, prototype the code cave as a file-level build
 only (do not flash) and verify it round-trips correctly before ever
 testing on hardware, exactly as Patches B and C did.
 
-## Priority 3 — Locate the charging-state → LED-color connection
+## Priority 4 — Locate the charging-state → LED-color connection
 
 **Description:** find the code (or shared data structure) connecting the
 power-management task's charging-state logic to whatever code decides the
@@ -191,7 +228,7 @@ in a second, separate firmware build (the `ev` variant).
    decompiler's switch-table/struct inference sometimes resolves exactly
    this kind of indirect dispatch.
 
-## Priority 4 — Photographic and video documentation
+## Priority 5 — Photographic and video documentation
 
 **Description:** no photographs or video exist of the physical LED
 behavior for any state (normal, charging, charged, boot self-test, patched
@@ -216,7 +253,7 @@ setup with independent charging (e.g., a charging dock) and a separate data
 connection may be required). Store results in `images/` and `research/screenshots/`,
 referenced from [`docs/13_experiments.md`](13_experiments.md) and [`docs/09_led_policy.md`](09_led_policy.md).
 
-## Priority 5 — Complete the JSON/zlib config protocol reverse engineering
+## Priority 6 — Complete the JSON/zlib config protocol reverse engineering
 
 **Description:** confirm the hypothesized JSON+zlib configuration protocol
 ([`docs/10_protocol_analysis.md`](10_protocol_analysis.md) §10.2) by capturing an actual payload, most
@@ -241,7 +278,7 @@ in [`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt)), then flash ba
 `--restore-json` active, capturing all filesystem activity and USB traffic
 throughout both transitions.
 
-## Priority 6 — Investigate `user_flash` and `user_data` commands
+## Priority 7 — Investigate `user_flash` and `user_data` commands
 
 **Description:** these two debug-shell commands ([`docs/11_hid_commands.md`](11_hid_commands.md))
 were discovered but never fully exercised. If LED-relevant configuration is
@@ -262,7 +299,7 @@ delivery mechanism, not as new research insight.
 `user_data all` (read-only, safe) to understand the current data layout
 before attempting any write.
 
-## Priority 7 — Understand the `0x412000` / `0x012000` base-address discrepancy
+## Priority 8 — Understand the `0x412000` / `0x012000` base-address discrepancy
 
 **Description:** documented as an open question in
 [`docs/05_firmware_layout.md`](05_firmware_layout.md) §5.4 — why the disassembly-correct base
@@ -280,7 +317,7 @@ boot/update process worth knowing.
 **Likelihood of success:** High, if pursued — this is a "look it up"
 problem, not an open-ended research problem.
 
-## Priority 8 — Extend the Ghidra reference-resolution investigation
+## Priority 9 — Extend the Ghidra reference-resolution investigation
 
 **Description:** understand why Ghidra's cross-reference analysis
 repeatedly failed to find references that manual inspection confirmed exist
@@ -299,7 +336,7 @@ sometimes a known, documented Ghidra limitation (worth checking Ghidra's
 own issue tracker/documentation for ARM Cortex-M-specific reference
 analysis caveats) and sometimes something project-specific.
 
-## Priority 9 — Firmware-version compatibility testing
+## Priority 10 — Firmware-version compatibility testing
 
 **Description:** all live patching work in this project targeted exactly
 one firmware build. Confirm whether the patch offsets, config table
@@ -319,7 +356,7 @@ independently verified across all 5 zlib-wrapped files, see
 offsets, which are expected to shift between builds with different compiled
 code layouts.
 
-## Priority 10 — Radio firmware analysis
+## Priority 11 — Radio firmware analysis
 
 **Description:** the two `indexcontroller_radio_*.fw` files are not
 zlib-compressed and were not analyzed at all in this project
@@ -334,7 +371,7 @@ possibly higher for other research questions about the controller.
 
 **Likelihood of success:** Unknown.
 
-## Priority 11 — Security-focused follow-up on the Debug interface
+## Priority 12 — Security-focused follow-up on the Debug interface
 
 **Description:** the undocumented Debug interface
 ([`docs/12_debug_interfaces.md`](12_debug_interfaces.md)) requires no authentication and exposes

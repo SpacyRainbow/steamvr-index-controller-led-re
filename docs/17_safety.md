@@ -3,6 +3,17 @@
 Read this before performing any firmware modification described in this
 repository against real hardware.
 
+**Current status (as of this session): firmware flashing is broken.** As
+of the most recent session, `lighthouse_watchman_update` locally rejects
+every file produced by this project's patch-building pipeline — including
+a fresh rebuild of the previously-proven black patch — while the
+unmodified original firmware still flashes fine. This is a **safe**
+failure (rejected before any device communication, confirmed via the
+debug shell across every attempt), but it means you should **not** expect
+the procedures below to currently produce a flashable file without first
+checking [`docs/13_experiments.md`](13_experiments.md) Experiment 9 and
+[`docs/14_failed_attempts.md`](14_failed_attempts.md) "Open regressions" for the latest status.
+
 ## Risk summary
 
 **All firmware-flashing work in this project was performed against a

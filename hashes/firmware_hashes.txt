@@ -43,3 +43,4 @@ e3800372d74a2afc3a5ff034f0472e5336f4ae5212eea221048253e940a27af3  indexcontrolle
 e33aea641e72cff911075e62edebdbed3aae65c3a34c11116f71caf0e56ededd  indexcontroller_app_LEDTEST_v0.decompressed.bin
 2ee59c7fc226a38dd519f80a683b15392d5f3ae7474cd6808cede8a53f67b7b5  indexcontroller_app_LEDBLACK.decompressed.bin
 f8a234889a5afba8b4932438ac64e8149851ed2c24d97983be9c68a7ef2bd9a5  indexcontroller_app_LEDBLUE_255.decompressed.bin
+4565bbd400f796740bdd4649a48c828af6a44cf1b4175d9556a950b9ad3abd25  indexcontroller_app_NOOP_recompress.fw   zero-content-change re-encode (decompress+recompress+refooter, no patch applied) -- built to isolate the Experiment 9 flash-validation regression; decompresses byte-identical to indexcontroller_app_20230902_v1693638519.fw but is ALSO rejected by lighthouse_watchman_update ("Invalid firmware file"), proving the rejection is about the re-encoding pipeline itself, not patch content -- see docs/13_experiments.md Experiment 9

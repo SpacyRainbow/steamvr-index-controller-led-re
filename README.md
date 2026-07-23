@@ -76,6 +76,13 @@ reasonable, why it failed, what it ruled out) in
 - `--restore-json` (Valve's own update tool flag) never produced a
   findable configuration backup file in this project's testing, despite
   two full successful firmware updates.
+- **Current, unresolved:** as of the most recent session, firmware
+  flashing itself is broken — the update tool locally rejects every file
+  built by this project's patch pipeline, including a fresh rebuild of the
+  *already-proven* black patch, while the unmodified original firmware
+  still flashes fine. Zero device risk (every rejection happens before any
+  device communication), but it blocks further live patching until
+  resolved. See [`docs/13_experiments.md`](docs/13_experiments.md) Experiment 9.
 
 None of this is hidden in a "known issues" appendix — [`docs/14_failed_attempts.md`](docs/14_failed_attempts.md)
 is linked from the repository layout below like every other document, and
@@ -187,6 +194,10 @@ See [`tests/README.md`](tests/README.md) for what's covered and why.
 
 ## Known limitations
 
+- **Firmware flashing is currently broken** (as of the most recent
+  session) — see "What didn't work" above and
+  [`docs/13_experiments.md`](docs/13_experiments.md) Experiment 9. This affects the currently
+  buildable Patch C and any re-flash of the already-proven Patch B alike.
 - The blanket "LED off" patch disables **all** LED indication, including the
   charging/charged status colors that most users would want to keep. See
   [`docs/16_charging_led_research.md`](docs/16_charging_led_research.md).

@@ -449,3 +449,92 @@ useful negative results for anyone continuing this work.
 
 **Recommendation:** See the prioritized next steps in
 [`docs/16_charging_led_research.md`](16_charging_led_research.md) and [`docs/18_future_work.md`](18_future_work.md).
+
+---
+
+## Experiment 9 — Attempted to flash Patch C; discovered a new, unresolved firmware-flashing regression
+
+**Goal:** Flash Patch C (forced solid blue, [`docs/15_firmware_patching.md`](15_firmware_patching.md) §15.3)
+to real hardware and visually confirm the result, with the human tester
+physically present.
+
+**Method:** Rebuilt Patch C from the SteamVR-installed source firmware
+(`scripts/patch_led_solid_color.py 255`); confirmed the source firmware's
+hash matched the documented baseline exactly, and the rebuilt patch's hash
+matched the previously-recorded (untested) hash exactly
+([`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt)). Closed SteamVR first to avoid any
+conflict with the update tool's device access. Attempted the flash via the
+same command used for every prior successful flash: `pkexec
+lighthouse_watchman_update -mv <file> --via-application`.
+
+**Actual result:** Rejected locally, before any device communication, with
+`"Error: Invalid firmware file."` — the same message as the original,
+long-since-fixed footer-CRC bug ([`docs/05_firmware_layout.md`](05_firmware_layout.md) §5.2). Confirmed
+via the debug shell that the device was completely untouched (unchanged
+uptime, unchanged firmware version) — **zero device risk** from this or
+any of the follow-up tests below.
+
+**Follow-up diagnosis (the actual point of this experiment, once the
+straightforward flash didn't work):**
+
+1. **Rebuilt and test-flashed `patch_led_black.py`'s output** (the
+   patch proven working in Experiment 7) fresh from the same source
+   firmware. Its hash matched the historically-proven file exactly.
+   **It was also rejected, identically.** This ruled out anything
+   Patch-C-specific.
+2. **Test-flashed the completely unmodified original `.fw` file** (the
+   same file used for Experiment 6a's safety-test flashes). **This
+   succeeded cleanly** (`"Successfully updated firmware."`, full device
+   re-enumeration). This proved the tool and environment work in general
+   — SteamVR's build ID matches the one this repository already documents
+   as its baseline (`23791826`), ruling out an obvious "newer/stricter
+   tool version" explanation.
+3. **Built a zero-content-change file**: decompressed the original,
+   recompressed it with zero patch applied (byte-identical decompressed
+   content, confirmed), and rebuilt the footer through the exact same
+   `comp_size`/`crc2`/`final_crc` recomputation logic every patch script
+   shares. **This was also rejected, identically** — despite decompressing
+   back to content that is byte-for-byte identical to the original, and
+   despite every footer field this project has ever documented
+   ([`docs/05_firmware_layout.md`](05_firmware_layout.md) §5.1–5.2) being independently re-verified
+   as internally self-consistent.
+
+**Conclusion so far:** the rejection is **not** about patch content, not
+about the footer/CRC math (which remains verified correct against every
+documented field), and not an obviously stale/different tool version.
+It is specifically triggered by *something about how this project's
+recompression pipeline re-encodes the zlib stream* — a difference the
+update tool's local validation catches that isn't fully understood yet.
+This is a **new, genuine regression**, not a rediscovery of the original
+CRC bug: Patch B's success in Experiment 7 is well-evidenced (human
+confirmation, live re-enumeration, uptime reset) and is not being
+second-guessed here, but *something* has changed since then that makes
+the exact same recompression approach no longer produce an acceptable
+file, and that "something" has not yet been identified.
+
+Started a proper reverse-engineering pass on the update tool's local
+validation function (`fcn.0003e750` at file offset `0x3e750` in the
+current binary, confirmed via re-extracting radare2 locally per
+[`tools/radare2_setup.md`](../tools/radare2_setup.md); confirmed the exit code `17` (`0x11`) is set
+immediately after printing this exact error string, gated on a status
+value passed in from a single caller, `fcn.00048df0`) but did not finish
+decompiling it — the code is dense, heavily-inlined, optimized C++ with
+vtables, RTTI (`__dynamic_cast`), and iostream operator chains, genuinely
+slow to read via raw disassembly. Properly finishing this would benefit
+from Ghidra's decompiler rather than continued manual `objdump`/`radare2`
+reading.
+
+**Evidence:** all commands and outputs captured in this session; hashes of
+every file involved recorded in [`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt) (see the
+`NOOP_recompress` entry, added for this experiment specifically to make
+the zero-diff test reproducible).
+
+**Confidence:** 100% for every negative/positive result observed (each
+was directly reproduced against real hardware, with a debug-shell-verified
+before/after state); 0% (genuinely unknown) for the *root cause*.
+
+**Retry recommended:** yes — this now **blocks all further live firmware
+patching** in this project, including re-verifying Patch B still works,
+until resolved. See [`docs/18_future_work.md`](18_future_work.md), now updated with this as the
+top-priority item ahead of the charging-LED research thread, since no
+patch (new or previously-proven) can currently be flashed at all.

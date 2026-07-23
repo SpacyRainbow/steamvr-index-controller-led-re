@@ -57,6 +57,43 @@ compressed a longer, properly-hedged statement in [`docs/09_led_policy.md`](09_l
 into a bare assertion in a different document's docstring, and the hedge
 was lost in that compression.
 
+## Open regressions (not yet resolved — read this before flashing anything)
+
+Unlike every other entry in this document, this one is not a closed dead
+end. It actively blocks live firmware patching in this project as of this
+session, and anyone picking this project back up should read it first.
+
+### Firmware flashing is currently broken for ANY re-encoded file, not just new patches
+
+**Tried:** flashing Patch C (forced blue) to real hardware, with the human
+tester physically present. Full account: [`docs/13_experiments.md`](13_experiments.md) Experiment 9.
+**Result:** rejected locally (`"Error: Invalid firmware file."`, exit code
+17), before any device communication. Follow-up diagnosis ruled out, in
+order: Patch-C-specific content (a fresh, hash-verified rebuild of the
+*already-proven* black patch was **also** rejected, identically), a
+stale/newer update-tool version (the completely unmodified original
+firmware flashes fine, and SteamVR's build ID matches this repository's
+documented baseline), and the footer/CRC math (a zero-content-change
+re-encode, with every documented footer field independently re-verified
+correct, was **also** rejected).
+**Learned:** the rejection is triggered by something about how this
+project's zlib recompression pipeline re-encodes the compressed stream —
+not by patch content, not by the footer fields this project has ever
+documented. This is a genuine regression, not a resurfacing of the
+original (long-fixed) footer-CRC bug: Patch B's original success
+(Experiment 7) is well-evidenced and not in doubt, but *something* has
+changed since then that the exact same pipeline no longer satisfies, and
+that something has not been identified yet. A partial reverse-engineering
+pass on the update tool's validation function was started (radare2,
+re-extracted locally per [`tools/radare2_setup.md`](../tools/radare2_setup.md)) but not finished — the
+code is dense, optimized, RTTI-heavy C++ that's slow to read via raw
+disassembly; Ghidra's decompiler would likely resolve this much faster.
+**Retry recommended:** yes, as the top priority — see [`docs/18_future_work.md`](18_future_work.md).
+Until this is resolved, do not assume [`docs/15_firmware_patching.md`](15_firmware_patching.md)'s
+documented procedure still produces a flashable file; verify with a cheap
+same-content re-encode test (see Experiment 9's method) before attempting
+a real patch.
+
 ## Research-direction dead ends
 
 ### DJm00n/ControllersInfo has no Valve entry

@@ -12,7 +12,7 @@ Produce a firmware patch that blanks the LED during normal
 ("ready"/actively-used) operation, while **preserving** the existing
 charging (orange) and charged (white) status indication. This is a
 refinement of the already-proven "always off" patch
-(`docs/15_firmware_patching.md` Patch B, `docs/13_experiments.md`
+([`docs/15_firmware_patching.md`](15_firmware_patching.md) Patch B, [`docs/13_experiments.md`](13_experiments.md)
 Experiment 7), which is too blunt for this purpose since it disables the
 LED unconditionally, including while charging.
 
@@ -20,7 +20,7 @@ LED unconditionally, including while charging.
 
 The "always off" patch works because it targets a genuine choke point: one
 low-level function through which every color request passes
-(`docs/07_led_architecture.md` Layer 1). A selective patch cannot target
+([`docs/07_led_architecture.md`](07_led_architecture.md) Layer 1). A selective patch cannot target
 that same choke point with a simple unconditional change — it needs the
 patch to distinguish *which* state is requesting the color, which requires
 locating the code that makes that distinction in the first place. That code
@@ -29,7 +29,7 @@ exactly where it stops.
 
 ## What was successfully traced (high confidence)
 
-See `docs/07_led_architecture.md` and `docs/06_firmware_symbols.md` §6.3
+See [`docs/07_led_architecture.md`](07_led_architecture.md) and [`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.3
 for full detail; summarized here:
 
 - **Layer 1** (`0x41dbf0`, `0x419250`, `0x4232c4`): the hardware write
@@ -41,7 +41,7 @@ for full detail; summarized here:
   roughly `0x41d859`–`0x41dac4`): three direct callers of the Layer 2
   wrapper, found via Ghidra's reference manager once the correct function
   entry point (`0x41d7ac`, not the initially-assumed `0x41d7a8` — see
-  `docs/14_failed_attempts.md`) was identified. Two of these
+  [`docs/14_failed_attempts.md`](14_failed_attempts.md)) was identified. Two of these
   (`0x41d6fa`, `0x41d938`) read a color value from a caller-supplied struct
   field rather than a literal; the third (`0x41da90`) always passes a
   literal `color = 0`.
@@ -67,7 +67,7 @@ All of the following were tried, in this order, against the same target
    (with and without the Thumb bit set) stored anywhere as a literal 4-byte
    value, on the theory that they might be invoked via a function-pointer
    table rather than a direct call. Zero results. (See
-   `docs/14_failed_attempts.md` for the related, separately-documented
+   [`docs/14_failed_attempts.md`](14_failed_attempts.md) for the related, separately-documented
    "ownership tag" dead end encountered while investigating structures
    *inside* this Layer 3 region.)
 
@@ -89,7 +89,7 @@ Plausible explanations, none confirmed:
   resolve without symbolic execution).
 - They are invoked from outside the application firmware image entirely
   (e.g., from the bootloader or FPGA-adjacent code, which were not
-  analyzed in this project at all — see `docs/06_firmware_symbols.md` §6.5
+  analyzed in this project at all — see [`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.5
   "What is NOT yet mapped").
 
 ## The power-management task lead
@@ -113,22 +113,22 @@ power-management state machine:
 
 The code region containing these strings (another large, Ghidra-unbounded
 gap, manually read in full — preserved in
-`research/decompiler_notes/pm_gap_listing.txt`) was read line by line.
+[`research/decompiler_notes/pm_gap_listing.txt`](../research/decompiler_notes/pm_gap_listing.txt)) was read line by line.
 **Finding: this code does not call any function in the traced LED call
 graph.** It calls a distinct set of functions (`0x43c054`, `0x430900`,
 `0x42f0e0`, `0x43124c`, `0x42fa6c`, `0x415648`, `0x415620`, `0x4156e8`, and
 others) none of which match any address identified in
-`docs/06_firmware_symbols.md` §6.3.
+[`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.3.
 
 **Interpretation:** this is consistent with an RTOS architecture where the
 power-management task updates a piece of **shared state** (a struct field,
 global variable, or message-queue post) that a *separate* task — reads
 independently, rather than the power-management code directly calling into
 LED-setting functions. The live `tasks` debug shell command
-(`docs/11_hid_commands.md`) lists a task named `vrc` among twelve RTOS
+([`docs/11_hid_commands.md`](11_hid_commands.md)) lists a task named `vrc` among twelve RTOS
 tasks, which is a reasonable candidate for "the task that owns LED policy
 decisions," by analogy with `vrc` also being the name used elsewhere in the
-config table (`docs/06_firmware_symbols.md` §6.2, entry index 0) — but this
+config table ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.2, entry index 0) — but this
 is **not confirmed**; no `vrc`-task code was specifically identified or
 disassembled.
 
@@ -143,7 +143,7 @@ memory-watch capability this project did not have access to).
 ## Follow-up session: locating the PM struct and its readers (partial progress, connection still not found)
 
 A later session (with live hardware still connected but no ability to
-visually observe the controller — see `docs/13_experiments.md`) picked
+visually observe the controller — see [`docs/13_experiments.md`](13_experiments.md)) picked
 this up using the data-flow approach recommended above. Concrete new
 findings, none of which close the open question, but all narrowing the
 search space for whoever continues this work:
@@ -175,7 +175,7 @@ Investigating these 14 locations found:
 - **A lead that looked very promising and turned out to be a false trail**:
   code reading `+0x24` calls two functions, `0x414dbc` and `0x414e38`,
   which are the *exact same two functions* the LED subsystem's
-  `FUN_0041d6b4` (`docs/06_firmware_symbols.md` §6.3) calls when applying a
+  `FUN_0041d6b4` ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.3) calls when applying a
   "glow" pattern. Decompiling both fully (Ghidra) resolved this: they are
   general-purpose software-timer registration/cancellation primitives
   (source file `tick_handler.c`, confirmed via an embedded assert string),
@@ -183,7 +183,7 @@ Investigating these 14 locations found:
   subsystem uses them to schedule glow-animation timer ticks; the
   power-management code uses them for something else entirely (most likely
   an unrelated timeout). This is a real, understood dead end — see
-  `docs/14_failed_attempts.md`.
+  [`docs/14_failed_attempts.md`](14_failed_attempts.md).
 - **The same "zero direct callers" symptom recurs** for the new
   `+0x28`-checking and `+0x15`/`+0x16`-writing functions, using the exact
   same three independent search methods that failed for the LED Layer-3
@@ -198,10 +198,10 @@ Investigating these 14 locations found:
   framework used throughout this RTOS firmware) is the actual thing
   standing in the way, not something specific to LED policy. Understanding
   *that* generic mechanism, once, would likely unlock this question and
-  probably others — see `docs/18_future_work.md`.
+  probably others — see [`docs/18_future_work.md`](18_future_work.md).
 
 **A tooling bug was found and fixed during this session.** The
-brute-force direct-call-encoding search (`scripts/find_bl_callers.py`,
+brute-force direct-call-encoding search ([`scripts/find_bl_callers.py`](../scripts/find_bl_callers.py),
 previously used only as an uncommitted inline script) had a bit-shift
 error that could, for certain offset magnitudes, alias two different call
 targets onto the same encoded instruction bytes — producing an occasional
@@ -213,8 +213,8 @@ findings for the LED Layer-3 functions (`0x41d6fa`, `0x41d938`,
 `0x41da90`) — the result did not change; those functions still have zero
 findable direct callers.** The central conclusion of this document is
 therefore unaffected. See the bug-history note in
-`scripts/find_bl_callers.py`'s module docstring for full detail, and
-`docs/14_failed_attempts.md` for why this is preserved rather than quietly
+[`scripts/find_bl_callers.py`](../scripts/find_bl_callers.py)'s module docstring for full detail, and
+[`docs/14_failed_attempts.md`](14_failed_attempts.md) for why this is preserved rather than quietly
 fixed and forgotten.
 
 **Status after this session: still open.** No selective (charging-aware)
@@ -229,7 +229,7 @@ mechanism, not an LED-specific one) — not in a working patch.
 
 Prompted by the user's observation that blue is a real, existing state for
 USB/host-connection and pairing status (correcting an earlier wrong
-assumption — see `docs/14_failed_attempts.md`), and the follow-up request
+assumption — see [`docs/14_failed_attempts.md`](14_failed_attempts.md)), and the follow-up request
 to explore disabling the LED specifically while connected to SteamVR
 (reverting to stock behavior otherwise), a third investigative thread was
 opened: is a "connected to host" condition more tractable to locate than
@@ -263,19 +263,19 @@ offsets correspond to which subsystem, and specifically which one the LED
 policy reads) is a substantially larger undertaking than anything
 attempted so far in this project, and was not completed in this session.
 This is recorded as a genuine, promising new lead rather than a dead end
-— see `docs/18_future_work.md` for the specific recommended next step.
+— see [`docs/18_future_work.md`](18_future_work.md) for the specific recommended next step.
 
 ## Tooling used, and what it does/doesn't help with
 
 A full headless Ghidra 12.1.2 installation was set up specifically to
-support this investigation (`tools/ghidra_setup.md`), including automated
+support this investigation ([`tools/ghidra_setup.md`](../tools/ghidra_setup.md)), including automated
 full-program analysis (function detection, ARM constant-reference
 resolution, address-table/switch detection) and scripted decompilation via
 custom Java `GhidraScript`s (preserved in `research/decompiler_notes/`).
 This was a substantial and successful improvement over the manual
 capstone-based disassembly used earlier in the project (it directly
 resolved several open questions and caught the Layer-2 function-boundary
-mistake described in `docs/14_failed_attempts.md`) — but it does **not**,
+mistake described in [`docs/14_failed_attempts.md`](14_failed_attempts.md)) — but it does **not**,
 in its default configuration, resolve either the Layer 3 caller mystery or
 the RTOS shared-state connection. Both would likely benefit from:
 
@@ -290,7 +290,7 @@ the RTOS shared-state connection. Both would likely benefit from:
 
 ## Current recommendation
 
-See `docs/18_future_work.md` for the prioritized next steps. In summary,
+See [`docs/18_future_work.md`](18_future_work.md) for the prioritized next steps. In summary,
 the most promising next actions:
 
 1. **Live USB traffic capture** during an actual charging-state transition

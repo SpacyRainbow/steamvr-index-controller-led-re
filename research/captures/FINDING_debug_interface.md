@@ -5,8 +5,8 @@
 
 ## Sequence of events
 
-1. Baseline: wired connection enumerates with **3** HID interfaces: `IMU` (input0), `Optical` (input1), `Controller` (input2). Report descriptors captured in `report_descriptors_raw.txt` / `report_map_parsed.txt`.
-2. Ran `scripts/test_feature_toggle_candidates.py`, which does `SET_FEATURE` with value `0x01` then `0x00` on five untested 1-byte Feature report IDs (`0x06, 0x0c, 0x0d, 0x12, 0x16`) on the IMU interface (hidraw at the time: hidraw19).
+1. Baseline: wired connection enumerates with **3** HID interfaces: `IMU` (input0), `Optical` (input1), `Controller` (input2). Report descriptors captured in [`report_descriptors_raw.txt`](report_descriptors_raw.txt) / [`report_map_parsed.txt`](report_map_parsed.txt).
+2. Ran [`scripts/test_feature_toggle_candidates.py`](../../scripts/test_feature_toggle_candidates.py), which does `SET_FEATURE` with value `0x01` then `0x00` on five untested 1-byte Feature report IDs (`0x06, 0x0c, 0x0d, 0x12, 0x16`) on the IMU interface (hidraw at the time: hidraw19).
 3. `SET_FEATURE(0x06, 0x01)` → OK, revert to `0x00` → OK.
 4. `SET_FEATURE(0x0c, 0x01)` → OK, revert → OK.
 5. `SET_FEATURE(0x0d, 0x01)` → OK, revert → OK.

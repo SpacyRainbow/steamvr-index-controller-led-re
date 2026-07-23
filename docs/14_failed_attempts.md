@@ -15,8 +15,8 @@ correction came from.
 
 ### "Blue is a color the controller never normally shows" — WRONG
 
-**Claimed:** Patch C (`docs/15_firmware_patching.md`,
-`scripts/patch_led_solid_color.py`) was originally motivated and
+**Claimed:** Patch C ([`docs/15_firmware_patching.md`](15_firmware_patching.md),
+[`scripts/patch_led_solid_color.py`](../scripts/patch_led_solid_color.py)) was originally motivated and
 documented as producing "a color the controller's normal policy states
 don't produce," listing green/orange/white as the complete known palette.
 **Corrected by:** the user, from direct first-hand experience with Index
@@ -26,7 +26,7 @@ The user additionally confirmed the full known color palette is green,
 red, blue, white, orange — red was not previously documented anywhere in
 this project at all.
 **Why the project got this wrong:** the "known states" table in
-`docs/09_led_policy.md` was built entirely from (a) this project's own
+[`docs/09_led_policy.md`](09_led_policy.md) was built entirely from (a) this project's own
 direct visual observation, which only ever saw green (normal use) and the
 patched black, and (b) general secondhand knowledge about
 charging/charged colors stated at the very start of the investigation.
@@ -34,7 +34,7 @@ Connection/pairing states were never in scope for what had been directly
 observed or researched, so their existence (and blue's role in them) simply
 wasn't in the document to be wrong about — the actual error was
 overgeneralizing "the states we've looked into" into "the complete
-palette," stated in `scripts/patch_led_solid_color.py`'s docstring as a
+palette," stated in [`scripts/patch_led_solid_color.py`](../scripts/patch_led_solid_color.py)'s docstring as a
 motivating claim ("a color this controller's normal policy states are not
 known to ever produce") without the hedge that only 2-3 states had ever
 actually been investigated.
@@ -46,14 +46,14 @@ as reproducing an existing state (whatever blue's exact role is) via an
 unconditional software patch instead, which is arguably still a valid
 demonstration (forcing a real state on permanently, regardless of what the
 policy would otherwise choose) but not the originally-claimed one.
-**Fixed in:** `docs/09_led_policy.md` (full corrected state/color table),
-`docs/15_firmware_patching.md`, `scripts/patch_led_solid_color.py`
+**Fixed in:** [`docs/09_led_policy.md`](09_led_policy.md) (full corrected state/color table),
+[`docs/15_firmware_patching.md`](15_firmware_patching.md), [`scripts/patch_led_solid_color.py`](../scripts/patch_led_solid_color.py)
 docstring.
 **Lesson:** when a document lists "known states" or "known colors" as if
 complete, make the completeness caveat explicit and prominent (e.g. "the
 only states we have directly investigated," not just "known states") —
 this project generally does this well, but Patch C's motivating claim
-compressed a longer, properly-hedged statement in `docs/09_led_policy.md`
+compressed a longer, properly-hedged statement in [`docs/09_led_policy.md`](09_led_policy.md)
 into a bare assertion in a different document's docstring, and the hedge
 was lost in that compression.
 
@@ -95,7 +95,7 @@ parser in general does distinguish valid from invalid syntax; `config`
 specifically just doesn't implement a write path via this command.
 **Learned:** config writes, if possible at all, do not go through this
 plaintext shell command. This directly motivated the pivot to firmware
-flashing as the write mechanism instead (`docs/13_experiments.md`
+flashing as the write mechanism instead ([`docs/13_experiments.md`](13_experiments.md)
 Experiments 5–7), which succeeded.
 **Retry recommended:** no — superseded by the firmware-flash approach,
 which works and is documented.
@@ -125,7 +125,7 @@ remaining in the project.
 ### Passive log-listening for spontaneous "LED color change" log lines
 
 **Tried:** ran a passive HID read loop
-(`scripts/listen_debug.py`) on the Debug interface for ~25 seconds while
+([`scripts/listen_debug.py`](../scripts/listen_debug.py)) on the Debug interface for ~25 seconds while
 issuing `watchman suspend`/`watchman resume` and `power get` commands via a
 separate process, hoping to trigger and observe the firmware's own
 `"LED %u: color = 0x%06X->0x%06X..."` log line for a real state transition.
@@ -170,7 +170,7 @@ hypothesis; re-read the tool's own diagnostic output closely before
 escalating to more invasive debugging (e.g., before granting root, or before
 disassembling the tool).
 **Retry recommended:** n/a — solved, documented in
-`docs/10_protocol_analysis.md`.
+[`docs/10_protocol_analysis.md`](10_protocol_analysis.md).
 
 ### `sudo -v` fails with no TTY available
 
@@ -189,7 +189,7 @@ during unrelated cleanup work) shows a native GUI password dialog
 independent of any TTY. This became the standard privilege-escalation
 method for the rest of the project.
 **Retry recommended:** no — `pkexec` is the documented working solution,
-see `docs/17_safety.md`.
+see [`docs/17_safety.md`](17_safety.md).
 
 ## Static-analysis dead ends
 
@@ -197,7 +197,7 @@ see `docs/17_safety.md`.
 
 **Tried:** having found the config-defaults table via exact-value byte
 search (a technique that worked very well — see
-`docs/06_firmware_symbols.md` §6.2), the same technique was tried for
+[`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.2), the same technique was tried for
 finding a hypothetical state→color table, searching for specific plausible
 packed-color values (various greens, oranges, whites) as raw 4-byte
 little-endian patterns across the entire firmware image.
@@ -228,16 +228,16 @@ the `0x41d7ac` color-request wrapper function (and, separately, several
 related "state handler" function addresses found later), both with and
 without the Thumb bit set, as a raw 4-byte little-endian value — the same
 technique that successfully located name-string pointers in the config
-table (`docs/06_firmware_symbols.md` §6.2).
+table ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.2).
 **Result:** zero hits, for every candidate address tried, across multiple
 rounds of this search as new candidate addresses were identified.
 **Learned:** whatever mechanism invokes these functions (they are
 definitely called — three direct callers of the wrapper were eventually
-found via Ghidra's reference manager, see `docs/06_firmware_symbols.md`),
+found via Ghidra's reference manager, see [`docs/06_firmware_symbols.md`](06_firmware_symbols.md)),
 it does not involve a plain stored absolute pointer anywhere in the static
 image. Possible explanations (none confirmed): PC-relative-only addressing
 throughout this specific compilation unit, or a calling mechanism this
-project did not identify at all (see `docs/16_charging_led_research.md`).
+project did not identify at all (see [`docs/16_charging_led_research.md`](16_charging_led_research.md)).
 **Retry recommended:** possibly, with a proper Ghidra function-pointer/
 vtable-detection pass rather than a manual literal search — not attempted
 within this project's time budget.
@@ -269,7 +269,7 @@ conclusions from a pattern found by linear scanning.
 ### "Ownership tag" constants turned out to be self-referential
 
 **Tried:** two functions found deep in the LED call graph
-(`docs/07_led_architecture.md` Layer 3) each compare a value against a
+([`docs/07_led_architecture.md`](07_led_architecture.md) Layer 3) each compare a value against a
 distinctive constant (`0x43E9B0`, `0x43E9CC`) while iterating a table,
 suggesting — by analogy with common "does this table entry belong to me"
 patterns — that these might be shared identifiers other subsystems also
@@ -316,16 +316,16 @@ manual linear listing of the surrounding bytes.
 **Retry recommended:** yes, as a tooling investigation in its own right —
 understanding *why* Ghidra's reference analysis misses these specific
 cases could unblock several currently-open questions at once (see
-`docs/18_future_work.md`).
+[`docs/18_future_work.md`](18_future_work.md)).
 
 ### The `0x414dbc`/`0x414e38` "glow trigger" lead was actually a generic timer facility
 
 **Tried:** during the follow-up power-management data-flow session
-(`docs/16_charging_led_research.md`), found that code reading a
+([`docs/16_charging_led_research.md`](16_charging_led_research.md)), found that code reading a
 power-management struct field (`+0x24`, scaled by 1000) calls two
 functions, `0x414dbc` and `0x414e38` — the exact same two functions the
 LED subsystem's `FUN_0041d6b4` calls for its "glow" pattern trigger
-(`docs/06_firmware_symbols.md` §6.3). This looked like a strong, direct
+([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.3). This looked like a strong, direct
 LED connection.
 **Result:** decompiling both functions fully with Ghidra showed they are
 general-purpose software-timer registration (`0x414dbc`, takes a context
@@ -349,7 +349,7 @@ schedules timed events, but not as an LED-connection lead.
 ### Brute-force `BL`-encoding search had a real bug (found, fixed, prior results re-verified)
 
 **Tried:** while continuing the search for callers of newly-identified
-power-management functions (the `docs/16_charging_led_research.md`
+power-management functions (the [`docs/16_charging_led_research.md`](16_charging_led_research.md)
 follow-up session), the exhaustive direct-call-encoding search technique
 (previously used successfully to find the LED wrapper's real callers, and
 trusted as "alignment-independent" and therefore highly reliable) reported
@@ -362,14 +362,14 @@ found a bit-shift error in the immediate-field encoding
 architecture reference, is `>> 11`), which can alias two different call
 targets onto identical encoded bytes for certain offset magnitudes.
 **Follow-up:** the bug was fixed and committed as
-`scripts/find_bl_callers.py` (previously this technique existed only as an
+[`scripts/find_bl_callers.py`](../scripts/find_bl_callers.py) (previously this technique existed only as an
 uncommitted inline script during live sessions, not a saved, reusable
 tool). The corrected version was re-run against every previously-documented
 "zero callers" finding that depended on this technique — most importantly
 the LED Layer-3 functions (`0x41d6fa`, `0x41d938`, `0x41da90`,
-`docs/16_charging_led_research.md`) — and **the results did not change**;
+[`docs/16_charging_led_research.md`](16_charging_led_research.md)) — and **the results did not change**;
 those functions still show zero direct callers under the corrected
-encoder. The central conclusions of `docs/16_charging_led_research.md`
+encoder. The central conclusions of [`docs/16_charging_led_research.md`](16_charging_led_research.md)
 are therefore unaffected by this bug.
 **Learned:** even a technique designed to be more rigorous than disassembly
 (exact byte-pattern matching, no alignment assumptions) can still have an
@@ -385,11 +385,49 @@ nothing else by chance).
 **Retry recommended:** no further action needed — bug fixed, tool
 committed with the bug history documented in its own module docstring, and
 the dependent conclusions re-verified. Anyone using
-`scripts/find_bl_callers.py` going forward should still manually
+[`scripts/find_bl_callers.py`](../scripts/find_bl_callers.py) going forward should still manually
 cross-check any nonzero result, per the caution now embedded in the
 script's own docstring.
 
 ## Environment/tooling dead ends (preserved because they cost real time)
+
+### Launching SteamVR to empirically observe connection-state behavior
+
+**Tried:** as a genuinely different (non-static-analysis) approach to the
+connection-state hypothesis ([`docs/16_charging_led_research.md`](16_charging_led_research.md)),
+attempted to launch SteamVR itself (`vrstartup.sh`, then via Steam's own
+`steam://rungameid/250820` launcher) with the controller connected, to see
+whether any live, debug-shell-observable state changed when SteamVR
+actually engaged with the device — sidestepping static analysis entirely
+with ground-truth behavior, similar in spirit to the still-unattempted
+USB-capture recommendation.
+**Result:** SteamVR's startup sequence stalled at a GUI dialog
+(`zenity --question "SteamVR requires superuser access to finish setup.
+Proceed?"`) before reaching the point of touching the controller at all —
+confirmed via Steam's own `controller.txt` log, which shows this specific
+launch attempt never got past initial setup (compare to other log entries
+showing `UpdateHmdState: timed out waiting for detected headset`, i.e.
+even *successful* past launches on this machine stall waiting for a
+headset this test setup doesn't have).
+**Why it stopped here:** the stalled dialog needs a human to click
+through, and — separately from that — this machine has no headset
+attached, which SteamVR's controller-management path appears to wait on
+regardless. Clicking through an elevated-privilege prompt without the
+user's direct, in-the-moment awareness would not be appropriate, so the
+attempt was stopped and the process tree cleanly killed rather than forced
+through.
+**Learned:** empirically observing "SteamVR connected" behavior on this
+specific test machine requires either a human present to click through
+the one-time setup dialog, or a real headset (or a way to fake one, not
+investigated), or a completely different observation method (a live USB
+capture on the existing wired connection remains the most promising
+untried option, since it doesn't require SteamVR to fully start — even a
+partial/attempted connection from the host might be visible at the USB
+level).
+**Retry recommended:** yes, next session with the user physically present
+to click through the one-time setup dialog once (it should not reappear
+on subsequent launches) — then this becomes a fast, repeatable technique
+for observing controller behavior under real SteamVR management.
 
 ### Ghidra headless launcher rejects a technically-correct Java version
 
@@ -406,7 +444,7 @@ which provides `javac` and the rest of the JDK toolchain.
 **Learned:** "unsupported java version" from this launcher can mean
 "wrong/incomplete JDK layout," not literally "wrong version number" — check
 for `javac`'s presence before assuming the version itself is the problem.
-**Retry recommended:** n/a — solved, documented in `tools/ghidra_setup.md`.
+**Retry recommended:** n/a — solved, documented in [`tools/ghidra_setup.md`](../tools/ghidra_setup.md).
 
 ### Runaway `inotifywait` recursive self-watch filled the sandbox's temp filesystem
 

@@ -3,7 +3,7 @@
 This document covers the two distinct protocols identified for
 communicating with the controller beyond normal HID input/output reports:
 the plaintext debug shell (summarized here, fully documented in
-`docs/11_hid_commands.md` and `docs/12_debug_interfaces.md`), and the binary
+[`docs/11_hid_commands.md`](11_hid_commands.md) and [`docs/12_debug_interfaces.md`](12_debug_interfaces.md)), and the binary
 firmware/config update protocol used by Valve's official
 `lighthouse_watchman_update` tool, which is the primary subject of this
 document.
@@ -16,8 +16,8 @@ they were conflated:
 1. **The debug shell protocol** — ASCII text commands and responses over a
    dedicated HID interface (report ID `0x76`). Human-oriented, read-mostly
    (writes to config values via this channel were attempted and did not
-   work — see `docs/14_failed_attempts.md`). Fully documented in
-   `docs/11_hid_commands.md` and `docs/12_debug_interfaces.md`.
+   work — see [`docs/14_failed_attempts.md`](14_failed_attempts.md)). Fully documented in
+   [`docs/11_hid_commands.md`](11_hid_commands.md) and [`docs/12_debug_interfaces.md`](12_debug_interfaces.md).
 2. **The firmware/config update protocol** — a binary protocol used to
    transfer entire firmware images (and, per the official tool's
    command-line flags, potentially standalone JSON configuration data) to
@@ -44,10 +44,10 @@ firmware images:
 ("LWU" is believed to stand for "Lighthouse Watchman Update," matching the
 name of Valve's own tool discussed below.) These strings, combined with the
 existence of a dedicated `stored_conf` flash partition separate from the
-application firmware image (`docs/05_firmware_layout.md` §5.3), support the
+application firmware image ([`docs/05_firmware_layout.md`](05_firmware_layout.md) §5.3), support the
 hypothesis that device-specific calibration/configuration data (distinct
 from the compiled-in defaults table documented in
-`docs/06_firmware_symbols.md`) is transferred to and from the device as a
+[`docs/06_firmware_symbols.md`](06_firmware_symbols.md)) is transferred to and from the device as a
 JSON payload, compressed with zlib, chunked over HID `SET_FEATURE`/
 `GET_FEATURE` transfers.
 
@@ -58,7 +58,7 @@ JSON payload.** Two attempts were made:
   during a config-related event — no output was captured (the debug
   interface does not appear to stream this class of log line, or the
   triggering event never occurred during the listening window). See
-  `docs/14_failed_attempts.md`.
+  [`docs/14_failed_attempts.md`](14_failed_attempts.md).
 - Running the official update tool with its `--restore-json` flag (which
   should, per its own `--help` text, back up and restore a JSON
   configuration file around a firmware update) — no backup file was found
@@ -66,7 +66,7 @@ JSON payload.** Two attempts were made:
   explanation (unconfirmed): the JSON backup/restore logic may only
   activate on an actual version change, and both test updates were
   same-version (byte-identical) safety tests. See
-  `docs/13_experiments.md` Experiment 5.
+  [`docs/13_experiments.md`](13_experiments.md) Experiment 5.
 
 **Status: hypothesis, ~70% confidence.** The string evidence for the
 protocol's *existence* is strong; its exact wire format and how to trigger
@@ -131,7 +131,7 @@ This confirms: the update is chunked (progress dots), a checksum is
 computed and communicated before the transfer begins, and an explicit reset
 command is sent after the data transfer completes, causing the device to
 re-enumerate on USB (confirmed via `lsusb` device-number increments,
-`docs/13_experiments.md`).
+[`docs/13_experiments.md`](13_experiments.md)).
 
 ### Underlying transport (from string evidence in the tool binary, not fully disassembled)
 
@@ -142,10 +142,10 @@ the debug shell — with a maximum single-message payload noted as 61 bytes
 (`"Simple HID message payload %zd is larger than max size of 61"`),
 suggesting a similar `[report_id][length][data]`-style framing to what was
 independently reverse-engineered for the debug shell
-(`docs/12_debug_interfaces.md`), though this was not directly confirmed by
+([`docs/12_debug_interfaces.md`](12_debug_interfaces.md)), though this was not directly confirmed by
 USB traffic capture — no USB-level packet capture (e.g., via `usbmon` or
 Wireshark) was performed in this project. This is listed as a priority item
-in `docs/18_future_work.md`, since a live capture would definitively answer
+in [`docs/18_future_work.md`](18_future_work.md), since a live capture would definitively answer
 the open JSON-protocol questions in §10.2.
 
 ## 10.4 What was proven vs. inferred — summary
@@ -153,7 +153,7 @@ the open JSON-protocol questions in §10.2.
 | Claim | Status | Confidence |
 |---|---|---|
 | A firmware image can be pushed to the device via `lighthouse_watchman_update --via-application` and successfully applied | **Proven**, reproduced 4 times live | 100% |
-| The `.fw` container format (`docs/05_firmware_layout.md`) is what the device/tool actually validates | **Proven** — a footer-format error was reproduced, understood, and fixed, after which patched files were accepted and flashed successfully | 100% |
+| The `.fw` container format ([`docs/05_firmware_layout.md`](05_firmware_layout.md)) is what the device/tool actually validates | **Proven** — a footer-format error was reproduced, understood, and fixed, after which patched files were accepted and flashed successfully | 100% |
 | A separate JSON+zlib config protocol exists | Inferred from strings; plausible | ~70% |
 | The exact wire framing of the JSON config protocol | Not determined | n/a |
 | The underlying HID transport uses `SET_FEATURE` with `[report_id][length][data]`-style framing, similar to the debug shell | Inferred from tool strings, not captured | ~60% |

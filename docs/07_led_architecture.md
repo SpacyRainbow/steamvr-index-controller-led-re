@@ -12,9 +12,9 @@ explicit about where the trace currently stops.
 color-request wrapper (layers 1–3 below) is verified with 100% confidence —
 both by static analysis (clean Ghidra decompilation, exhaustive caller
 search) and by live behavioral proof (the layer-1 patch in
-`docs/15_firmware_patching.md` visibly changed the physical LED). Layer 4
+[`docs/15_firmware_patching.md`](15_firmware_patching.md) visibly changed the physical LED). Layer 4
 and above (policy / state decision) is **not** verified and is the subject
-of `docs/16_charging_led_research.md`.
+of [`docs/16_charging_led_research.md`](16_charging_led_research.md).
 
 ## Layered call graph (traced layers)
 
@@ -61,7 +61,7 @@ flowchart TD
 
 The lowest level. `0x41dbf0` receives a caller-supplied `(led_id, packed_wrgb_color)`
 pair, calls `0x419250` to apply a per-channel calibration scale (see
-`docs/06_firmware_symbols.md` §6.3 for the exact arithmetic), then writes
+[`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.3 for the exact arithmetic), then writes
 each resulting byte to the LP5562 via `0x4232c4`.
 
 This is the layer where the project's proven patch lives: at runtime address
@@ -69,8 +69,8 @@ This is the layer where the project's proven patch lives: at runtime address
 freshly-scaled color into the register used for all three channel writes)
 was replaced with `movs r4, #0`, forcing every color request — from every
 caller, regardless of what color was actually requested — to be written as
-black. Full patch mechanics in `docs/15_firmware_patching.md`; live
-visual proof in `docs/13_experiments.md` Experiment 7.
+black. Full patch mechanics in [`docs/15_firmware_patching.md`](15_firmware_patching.md); live
+visual proof in [`docs/13_experiments.md`](13_experiments.md) Experiment 7.
 
 **Why this proves every state flows through here:** the patch is
 unconditional and was observed to turn off the LED regardless of device
@@ -79,7 +79,7 @@ the time of one test, and off in another). This means Layer 1 is a true
 choke point — every color, from every policy state, passes through this
 exact function. That is what makes an "always off" patch trivial and
 reliable, and also exactly why a *selective* patch cannot be made at this
-layer alone (see `docs/16_charging_led_research.md`).
+layer alone (see [`docs/16_charging_led_research.md`](16_charging_led_research.md)).
 
 ### Layer 2 — color-request wrapper (`0x41d7ac`)
 
@@ -88,13 +88,13 @@ is set, it clears that flag and first calls the off-path function
 (presumably to ensure a clean transition), then unconditionally calls the
 Layer 1 writer with whatever color the caller requested. This function
 decompiled cleanly with Ghidra and its logic is fully understood — see the
-decompiled source excerpt in `research/decompiler_notes/wrapper_decompile.c`.
+decompiled source excerpt in [`research/decompiler_notes/wrapper_decompile.c`](../research/decompiler_notes/wrapper_decompile.c).
 
 ### Layer 3 — per-LED entry points (unbounded code region)
 
 Three direct callers of the Layer 2 wrapper were found via Ghidra's
 reference manager (after correcting the entry-point address mistake
-described in `docs/06_firmware_symbols.md` §6.3):
+described in [`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.3):
 
 - `0x41d6fa` and `0x41d938` follow the same pattern: bounds-check the LED
   ID, then check a per-LED struct field; if set, branch to a different
@@ -121,8 +121,8 @@ functions was ever found** — not via Ghidra's reference manager, not via an
 exhaustive brute-force scan for every possible direct `BL` instruction
 encoding targeting them, and not via a raw-pointer search for their
 addresses stored as data anywhere in the image. This is a genuine, currently
-unresolved mystery, discussed further in `docs/09_led_policy.md` and
-`docs/14_failed_attempts.md`.
+unresolved mystery, discussed further in [`docs/09_led_policy.md`](09_led_policy.md) and
+[`docs/14_failed_attempts.md`](14_failed_attempts.md).
 
 ### Layer 4 — policy (not located)
 
@@ -136,7 +136,7 @@ strongly suggesting an RTOS shared-state or message-queue connection rather
 than a direct function call between the power-management task and whatever
 task actually applies the LED color (believed to be the `vrc` task, per the
 live `tasks` debug shell command listing, though this is not confirmed).
-Full account in `docs/16_charging_led_research.md`.
+Full account in [`docs/16_charging_led_research.md`](16_charging_led_research.md).
 
 ## Parallel path: GPIO driver
 
@@ -144,13 +144,13 @@ Full account in `docs/16_charging_led_research.md`.
 path using `led_driver_gpio.c`, presumably for hardware that uses discrete
 GPIO-driven LEDs instead of (or in addition to) the LP5562. This path was
 identified but not extensively traced, since the primary status LED under
-test is confirmed LP5562-driven (`docs/03_hardware.md`,
-`docs/08_lp5562_driver.md`). `0x41d804` appears to be a hardware-type
+test is confirmed LP5562-driven ([`docs/03_hardware.md`](03_hardware.md),
+[`docs/08_lp5562_driver.md`](08_lp5562_driver.md)). `0x41d804` appears to be a hardware-type
 dispatcher choosing between the two paths based on a per-LED configuration
-byte, though this was only traced one call deep (`docs/06_firmware_symbols.md`
+byte, though this was only traced one call deep ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md)
 §6.3).
 
 ## Diagrams referenced elsewhere
 
-- Firmware patch application workflow: `docs/15_firmware_patching.md`.
-- Protocol-level flow (SteamVR → HID → firmware): `docs/10_protocol_analysis.md`.
+- Firmware patch application workflow: [`docs/15_firmware_patching.md`](15_firmware_patching.md).
+- Protocol-level flow (SteamVR → HID → firmware): [`docs/10_protocol_analysis.md`](10_protocol_analysis.md).

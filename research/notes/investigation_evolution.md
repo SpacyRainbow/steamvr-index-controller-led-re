@@ -15,7 +15,7 @@ history.
 techniques (voltage-glitching the nRF52840's APPROTECT flash-read
 protection), based on general knowledge that embedded VR controller
 firmware is sometimes protected. Background research was done on this
-technique specifically to prepare for it (`docs/02_background.md`).
+technique specifically to prepare for it ([`docs/02_background.md`](../../docs/02_background.md)).
 
 **Evidence:** a plain `zlib.decompress()` call against the `.fw` files
 found directly inside the SteamVR installation directory succeeded
@@ -23,7 +23,7 @@ immediately, with no protection encountered at all.
 
 **Later discovery:** the firmware format has zero confidentiality
 protection — only a data-integrity CRC, discovered much later
-(`docs/05_firmware_layout.md`), which protects against corruption during
+([`docs/05_firmware_layout.md`](../../docs/05_firmware_layout.md)), which protects against corruption during
 flashing, not against reading.
 
 **Updated conclusion:** the entire hardware-extraction contingency was
@@ -38,8 +38,8 @@ protocol/firmware analysis instead.
 controller was a full-featured HID link or a charge-only connection.
 
 **Evidence:** a haptic-pulse command write succeeded
-(`scripts/test_haptic_sanity_check.py`), and subsequent full HID report
-descriptor enumeration (`scripts/dump_hid_descriptors.py`) found a rich set
+([`scripts/test_haptic_sanity_check.py`](../../scripts/test_haptic_sanity_check.py)), and subsequent full HID report
+descriptor enumeration ([`scripts/dump_hid_descriptors.py`](../../scripts/dump_hid_descriptors.py)) found a rich set
 of Input/Output/Feature reports across three interfaces.
 
 **Updated conclusion:** the wired connection is a genuine, full-featured
@@ -66,7 +66,7 @@ and expose a genuinely new, 4th USB HID interface named "Debug."
 LighthouseRedox-informed hypothesis — a dedicated debug/diagnostic
 interface, not just extra command bytes on the normal channel. This
 directly enabled everything from Experiment 2 onward
-(`docs/13_experiments.md`).
+([`docs/13_experiments.md`](../../docs/13_experiments.md)).
 
 ---
 
@@ -85,7 +85,7 @@ correctly errors on bad input).
 **Updated conclusion:** the plaintext shell is read-mostly for this
 category of data; a different mechanism (ultimately, full firmware
 flashing) was needed to actually write values. This is documented as a
-confirmed dead end (`docs/14_failed_attempts.md`) rather than an unresolved
+confirmed dead end ([`docs/14_failed_attempts.md`](../../docs/14_failed_attempts.md)) rather than an unresolved
 question — the negative result itself was a useful, load-bearing finding
 that redirected the project's approach.
 
@@ -104,7 +104,7 @@ Both results were genuine, confirmed effects (the values were verified to
 have actually changed via live readback), just not the complete story.
 
 **Later discovery:** deeper static analysis of the LED write pipeline
-(`docs/06_firmware_symbols.md` §6.3, `docs/07_led_architecture.md` Layer 1)
+([`docs/06_firmware_symbols.md`](../../docs/06_firmware_symbols.md) §6.3, [`docs/07_led_architecture.md`](../../docs/07_led_architecture.md) Layer 1)
 revealed these values are a *multiplicative calibration/scaling* stage
 applied to an already-determined base color, not the sole determinant of
 output. The actual base color is set elsewhere in the pipeline (and, for
@@ -113,7 +113,7 @@ item 7 below).
 
 **Updated conclusion:** `led_driver_current_*` is real and useful (proven
 effective), but the project's strongest, most unambiguous result required
-patching the color-computation pipeline directly (`docs/13_experiments.md`
+patching the color-computation pipeline directly ([`docs/13_experiments.md`](../../docs/13_experiments.md)
 Experiment 7), not just the calibration values. This distinction — between
 "a value that affects LED output" and "the value that determines LED
 output" — became a central organizing idea for the rest of the
@@ -124,12 +124,12 @@ investigation.
 ## 6. Confidence in manual disassembly vs. the need for proper tooling
 
 **Originally believed:** early LED-pipeline tracing was done via manual
-capstone-based linear disassembly (`scripts/disasm_config.py`), and
+capstone-based linear disassembly ([`scripts/disasm_config.py`](../../scripts/disasm_config.py)), and
 initial findings (including a specific "indirect call / vtable" pattern)
 were trusted at face value.
 
 **Evidence:** once a full Ghidra installation was set up
-(`tools/ghidra_setup.md`) and used to properly decompile the same region,
+([`tools/ghidra_setup.md`](../../tools/ghidra_setup.md)) and used to properly decompile the same region,
 it revealed that the earlier "vtable" pattern had been **misattributed to
 the wrong function** — a genuine function-boundary error from manual
 linear scanning, not a wrong interpretation of correct data.
@@ -138,7 +138,7 @@ linear scanning, not a wrong interpretation of correct data.
 function boundaries is meaningfully error-prone for this firmware's dense,
 VFP-heavy code style, in a way that cost real investigation time before
 being caught. This is documented explicitly as a methodological lesson
-(`docs/14_failed_attempts.md`), and the recommendation for any future work
+([`docs/14_failed_attempts.md`](../../docs/14_failed_attempts.md)), and the recommendation for any future work
 on this codebase is to prefer Ghidra (or equivalent) over manual scanning
 for anything beyond small, well-isolated code snippets.
 
@@ -167,9 +167,9 @@ task writes a status variable, a different task reads it independently) —
 a structurally different, and generally harder, class of reverse-
 engineering problem than everything solved earlier in the project. This
 reframing is the project's current stopping point and is documented in
-full in `docs/16_charging_led_research.md`, with the corresponding
+full in [`docs/16_charging_led_research.md`](../../docs/16_charging_led_research.md), with the corresponding
 retargeted recommendations (live USB capture, data-flow analysis rather
-than call-graph search) in `docs/18_future_work.md`.
+than call-graph search) in [`docs/18_future_work.md`](../../docs/18_future_work.md).
 
 ---
 

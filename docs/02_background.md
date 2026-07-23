@@ -43,7 +43,7 @@ as a starting point:
 - **`DJm00n/ControllersInfo`** (public GitHub repository cataloguing VR
   controller USB/HID identifiers) — checked early in the investigation.
   Found to have **no entry for Valve devices**, a dead end noted and
-  discarded quickly. See `14_failed_attempts.md`.
+  discarded quickly. See [`14_failed_attempts.md`](14_failed_attempts.md).
 - **`ValveSoftware` public IndexHardware repository** — found to contain CAD
   files only, no firmware or protocol information. Another quickly-discarded
   dead end.
@@ -55,7 +55,7 @@ as a starting point:
 
 A publicly available iFixit teardown of the Index Controller was used as the
 initial source for hardware identification, later independently confirmed
-via firmware string analysis (see `03_hardware.md` for the confirmed,
+via firmware string analysis (see [`03_hardware.md`](03_hardware.md) for the confirmed,
 firmware-verified hardware inventory):
 
 - MCU: Nordic nRF52840 (Cortex-M4F, Bluetooth Low Energy SoC family)
@@ -76,7 +76,7 @@ identified:
 - A public ESP32-based automated glitching tool by **Aaron Christophel**.
 
 This path was **never exercised**, because firmware extraction turned out to
-require no special technique at all — see `04_firmware_acquisition.md`. It
+require no special technique at all — see [`04_firmware_acquisition.md`](04_firmware_acquisition.md). It
 is recorded here only because it shaped early risk assessment (the
 investigation was prepared for the possibility of protected firmware, which
 did not materialize) and because it remains a viable fallback for anyone
@@ -88,6 +88,6 @@ The single most consequential piece of prior art was the LighthouseRedox
 HID protocol precedent. It established the expectation that Valve's
 firmware likely exposes vendor commands over standard HID Output/Feature
 reports rather than some entirely custom transport, which directly motivated
-the systematic HID report enumeration described in `12_debug_interfaces.md`
+the systematic HID report enumeration described in [`12_debug_interfaces.md`](12_debug_interfaces.md)
 — a process that led to discovering the undocumented Debug interface, the
 single most important structural discovery of this project.

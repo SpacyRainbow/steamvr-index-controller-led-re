@@ -50,7 +50,7 @@ Two uses:
 1. **x86-64 disassembly of `lighthouse_watchman_update`** (Valve's update
    tool) — a normal, un-flagged `r2 -qc "aaa; ..." <binary>` worked cleanly
    and quickly; this is what unblocked the `.fw` footer CRC reverse
-   engineering (`../docs/05_firmware_layout.md` §5.2).
+   engineering ([`../docs/05_firmware_layout.md`](../docs/05_firmware_layout.md) §5.2).
 2. **Early ARM Cortex-M firmware analysis** — attempted with:
    ```bash
    r2 -a arm -b 32 -m 0x412000 -e asm.arch=arm -e anal.arch=arm -e asm.bits=32 -e asm.cpu=cortex <firmware.bin>
@@ -60,8 +60,8 @@ Two uses:
    (fragmented into many tiny, apparently-noise "functions," and found no
    cross-references for several strings that manual inspection confirmed
    were referenced). This limitation is what ultimately motivated setting
-   up Ghidra (`ghidra_setup.md`) for the deeper LED-subsystem tracing work.
-   Full account: `../docs/14_failed_attempts.md`.
+   up Ghidra ([`ghidra_setup.md`](ghidra_setup.md)) for the deeper LED-subsystem tracing work.
+   Full account: [`../docs/14_failed_attempts.md`](../docs/14_failed_attempts.md).
 
 ## Known limitation encountered
 

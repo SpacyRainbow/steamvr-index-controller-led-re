@@ -6,8 +6,8 @@ and recommended approach.
 
 ## Priority 1 — Flash and verify Patch C (forced blue), the first thing to do with hardware access
 
-**Description:** `scripts/patch_led_solid_color.py` (Patch C,
-`docs/15_firmware_patching.md` §15.3) has been built and verified as a
+**Description:** [`scripts/patch_led_solid_color.py`](../scripts/patch_led_solid_color.py) (Patch C,
+[`docs/15_firmware_patching.md`](15_firmware_patching.md) §15.3) has been built and verified as a
 well-formed `.fw` file, but has never been flashed to real hardware. It
 reuses the exact patch point and mechanism as the proven black patch
 (Patch B), just with a nonzero immediate — expected with high confidence
@@ -18,8 +18,8 @@ existing output, look at the controller" task, not a research task. All
 the hard analysis work is already done.
 
 **Expected value:** High relative to effort — resolves an open, flagged
-"UNTESTED" marker in three places (`docs/15_firmware_patching.md`,
-`hashes/firmware_hashes.txt`, this file), and gives a second, independently
+"UNTESTED" marker in three places ([`docs/15_firmware_patching.md`](15_firmware_patching.md),
+[`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt), this file), and gives a second, independently
 striking positive demonstration (a color the controller never normally
 shows) alongside the proven black patch.
 
@@ -30,8 +30,8 @@ differently than expected, which would itself be an interesting finding.
 
 **Recommended approach:** `python3 scripts/patch_led_solid_color.py 255`,
 flash via the documented `pkexec lighthouse_watchman_update -mv <file>
---via-application` procedure (`docs/15_firmware_patching.md` §15.1), observe
-the physical LED, and update `docs/13_experiments.md` with a new experiment
+--via-application` procedure ([`docs/15_firmware_patching.md`](15_firmware_patching.md) §15.1), observe
+the physical LED, and update [`docs/13_experiments.md`](13_experiments.md) with a new experiment
 entry documenting the actual outcome — whatever it is, success or failure.
 Then remove the "UNTESTED" markers in the three locations listed above.
 
@@ -39,7 +39,7 @@ Then remove the "UNTESTED" markers in the three locations listed above.
 
 **Description:** Patch C (Priority 1 above) can only reach pure-blue
 shades, because its single-instruction technique zero-extends an 8-bit
-immediate into the whole register (`docs/15_firmware_patching.md` §15.3
+immediate into the whole register ([`docs/15_firmware_patching.md`](15_firmware_patching.md) §15.3
 "Why a code-cave is needed for two-channel colors"). A color like purple
 (simultaneous Red + Blue) needs a full 32-bit constant load, which doesn't
 fit in the same 2-byte instruction slot without relocating surrounding
@@ -67,9 +67,9 @@ within reach of a branch from the patch point).
 
 **Recommended approach:** start by confirming exactly how much slack space
 exists at the end of the decompressed application image (204,800 bytes
-allocated per `flash_info` vs. 197,940 used, `docs/05_firmware_layout.md`
+allocated per `flash_info` vs. 197,940 used, [`docs/05_firmware_layout.md`](05_firmware_layout.md)
 §5.3 — but first confirm whether that slack is actually part of the same
-byte range `scripts/patch_led_black.py` and `patch_led_solid_color.py`
+byte range [`scripts/patch_led_black.py`](../scripts/patch_led_black.py) and `patch_led_solid_color.py`
 operate on, or a separate region only relevant to the raw flash partition).
 If safe space is confirmed, prototype the code cave as a file-level build
 only (do not flash) and verify it round-trips correctly before ever
@@ -81,20 +81,20 @@ testing on hardware, exactly as Patches B and C did.
 power-management task's charging-state logic to whatever code decides the
 LED's color, to enable a selective patch (blank LED during normal use,
 preserve charging/charged indication). Full context in
-`docs/16_charging_led_research.md`.
+[`docs/16_charging_led_research.md`](16_charging_led_research.md).
 
 **Difficulty:** High. Static call-graph tracing has been exhausted (three
 independent methods, all failed to find Layer 3's callers — see
-`docs/14_failed_attempts.md`). A follow-up session made concrete progress
+[`docs/14_failed_attempts.md`](14_failed_attempts.md)). A follow-up session made concrete progress
 without closing the question: found the PM state struct's exact RAM
 address (`0x2000378c`) and several more of its field offsets
-(`docs/06_firmware_symbols.md` §6.5), ruled out one promising-looking lead
+([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.5), ruled out one promising-looking lead
 (a shared generic timer facility, not LED-specific), and — most
 importantly — found that the "zero statically-findable callers" symptom
 recurs for multiple *unrelated* functions (LED policy entry points AND
 power-management flag setters), suggesting a firmware-wide generic
 dispatch mechanism is the real obstacle, not something LED-specific. See
-`docs/16_charging_led_research.md` "Follow-up session" for full detail.
+[`docs/16_charging_led_research.md`](16_charging_led_research.md) "Follow-up session" for full detail.
 
 **Expected value:** High — this is the single most user-valuable
 improvement over the current "always off" patch, and was the specific
@@ -107,14 +107,14 @@ applying the right technique, not an open-ended unknown.
 
 **A third session narrowed this further**: prompted by the user's
 correction that blue is a real connection/pairing state (not an unused
-color — `docs/14_failed_attempts.md`), investigated whether a
+color — [`docs/14_failed_attempts.md`](14_failed_attempts.md)), investigated whether a
 "connected to host" condition might be more tractable than the charging
 enum. Found that a nearby struct (`0x20003878`, only 20 bytes from the PM
 struct's `0x2000378c`) is touched by a single very large function
 (`0x43c1a4`) reaching offsets beyond `+0x1000` — strong evidence that the
 PM/charging state and the pairing/mode state are not separate structs at
 all, but different offsets within **one large, shared device-state block**
-spanning multiple kilobytes. See `docs/16_charging_led_research.md`
+spanning multiple kilobytes. See [`docs/16_charging_led_research.md`](16_charging_led_research.md)
 "Connection-state hypothesis" for full detail. This did not find the LED
 connection either, but it reframes the mapping task: rather than treating
 "find the PM struct's reader" and "find the connection-state struct's
@@ -127,19 +127,19 @@ one large struct once.
    directly observed/photographed LED color. This sidesteps static analysis
    entirely by providing ground-truth data to work backward from.
 2. **Map the large shared device-state block** rooted around
-   `0x20003878`/`0x2000378c` (`docs/16_charging_led_research.md`
+   `0x20003878`/`0x2000378c` ([`docs/16_charging_led_research.md`](16_charging_led_research.md)
    "Connection-state hypothesis"), starting from the big initialization
    function at `0x43c1a4` (which touches many offsets across it) to build
    out a fuller offset map, rather than continuing to investigate each
    subsystem's struct as if separate.
 3. Investigate the generic dispatch mechanism itself (see
-   `docs/16_charging_led_research.md` "Current recommendation" item 2) —
+   [`docs/16_charging_led_research.md`](16_charging_led_research.md) "Current recommendation" item 2) —
    now believed to be the actual blocker shared by both the LED and
    power-management investigations, rather than chasing either subsystem
    individually.
 4. Ghidra data-flow analysis starting from the power-management struct's
    known address (`0x2000378c`) and field offsets
-   (`docs/06_firmware_symbols.md` §6.5) — no code was found that *reads*
+   ([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.5) — no code was found that *reads*
    the main state enum at `+0xc`; finding that reader is the most direct
    remaining lead.
 5. If hardware access allows it, an SWD/JTAG debug probe on the nRF52840
@@ -151,13 +151,13 @@ one large struct once.
 **Description:** no photographs or video exist of the physical LED
 behavior for any state (normal, charging, charged, boot self-test, patched
 off) — every observation in this project is the human tester's written
-testimony only (`docs/13_experiments.md`).
+testimony only ([`docs/13_experiments.md`](13_experiments.md)).
 
 **Difficulty:** Low — this is a documentation gap, not a research gap.
 
 **Expected value:** High for repository credibility and for resolving the
 open "orange/white" color-mapping verification gap noted in
-`docs/09_led_policy.md`.
+[`docs/09_led_policy.md`](09_led_policy.md).
 
 **Likelihood of success:** Very high — purely a matter of doing it.
 
@@ -169,12 +169,12 @@ test setup used in this project could not do both simultaneously, since
 the same USB cable provides both power and the debug HID connection; a
 setup with independent charging (e.g., a charging dock) and a separate data
 connection may be required). Store results in `images/` and `research/screenshots/`,
-referenced from `docs/13_experiments.md` and `docs/09_led_policy.md`.
+referenced from [`docs/13_experiments.md`](13_experiments.md) and [`docs/09_led_policy.md`](09_led_policy.md).
 
 ## Priority 5 — Complete the JSON/zlib config protocol reverse engineering
 
 **Description:** confirm the hypothesized JSON+zlib configuration protocol
-(`docs/10_protocol_analysis.md` §10.2) by capturing an actual payload, most
+([`docs/10_protocol_analysis.md`](10_protocol_analysis.md) §10.2) by capturing an actual payload, most
 likely via a genuine (not same-version) firmware update using
 `--restore-json`, combined with a live USB capture.
 
@@ -182,23 +182,23 @@ likely via a genuine (not same-version) firmware update using
 
 **Expected value:** Medium-high — if `led_driver_current_*` (or other
 LED-relevant values) are actually stored in the separate `stored_conf`
-flash partition (`docs/05_firmware_layout.md` §5.3) and settable via this
+flash partition ([`docs/05_firmware_layout.md`](05_firmware_layout.md) §5.3) and settable via this
 protocol independently of a full application firmware reflash, it would be
 a significantly lower-risk write path than the current approach.
 
 **Likelihood of success:** Moderate (~60%) — the string evidence for the
 protocol's existence is strong; the main uncertainty is whether a
 same-version-vs-different-version distinction (per the dead-end note in
-`docs/14_failed_attempts.md`) is really the blocker, or something else.
+[`docs/14_failed_attempts.md`](14_failed_attempts.md)) is really the blocker, or something else.
 
 **Recommended approach:** flash an older historical firmware build (hashes
-in `hashes/firmware_hashes.txt`), then flash back to the current one with
+in [`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt)), then flash back to the current one with
 `--restore-json` active, capturing all filesystem activity and USB traffic
 throughout both transitions.
 
 ## Priority 6 — Investigate `user_flash` and `user_data` commands
 
-**Description:** these two debug-shell commands (`docs/11_hid_commands.md`)
+**Description:** these two debug-shell commands ([`docs/11_hid_commands.md`](11_hid_commands.md))
 were discovered but never fully exercised. If LED-relevant configuration is
 stored in the `stored_conf`/`data_store` flash partitions rather than the
 application firmware's compiled-in defaults table, these commands (or the
@@ -220,7 +220,7 @@ before attempting any write.
 ## Priority 7 — Understand the `0x412000` / `0x012000` base-address discrepancy
 
 **Description:** documented as an open question in
-`docs/05_firmware_layout.md` §5.4 — why the disassembly-correct base
+[`docs/05_firmware_layout.md`](05_firmware_layout.md) §5.4 — why the disassembly-correct base
 address differs by exactly `0x400000` from the flash offset `flash_info`
 reports.
 
@@ -239,7 +239,7 @@ problem, not an open-ended research problem.
 
 **Description:** understand why Ghidra's cross-reference analysis
 repeatedly failed to find references that manual inspection confirmed exist
-(`docs/14_failed_attempts.md`, multiple entries) — this recurring pattern
+([`docs/14_failed_attempts.md`](14_failed_attempts.md), multiple entries) — this recurring pattern
 suggests a specific, identifiable analysis gap (compiler idiom, addressing
 mode, or Ghidra configuration issue) rather than coincidence.
 
@@ -260,7 +260,7 @@ analysis caveats) and sometimes something project-specific.
 one firmware build. Confirm whether the patch offsets, config table
 structure, and `.fw` container format understanding generalize to the other
 four application firmware builds present in this project's SteamVR
-installation (`hashes/firmware_hashes.txt`).
+installation ([`hashes/firmware_hashes.txt`](../hashes/firmware_hashes.txt)).
 
 **Difficulty:** Low — mostly repeating already-documented analysis
 procedures against different input files.
@@ -270,7 +270,7 @@ tooling in this repository.
 
 **Likelihood of success:** High for the container-format work (already
 independently verified across all 5 zlib-wrapped files, see
-`docs/05_firmware_layout.md`); lower/unknown for the exact code-patch
+[`docs/05_firmware_layout.md`](05_firmware_layout.md)); lower/unknown for the exact code-patch
 offsets, which are expected to shift between builds with different compiled
 code layouts.
 
@@ -278,7 +278,7 @@ code layouts.
 
 **Description:** the two `indexcontroller_radio_*.fw` files are not
 zlib-compressed and were not analyzed at all in this project
-(`docs/04_firmware_acquisition.md`). Unknown whether they are relevant to
+([`docs/04_firmware_acquisition.md`](04_firmware_acquisition.md)). Unknown whether they are relevant to
 the LED question at all (unlikely, but not confirmed) or of independent
 research interest.
 
@@ -292,7 +292,7 @@ possibly higher for other research questions about the controller.
 ## Priority 11 — Security-focused follow-up on the Debug interface
 
 **Description:** the undocumented Debug interface
-(`docs/12_debug_interfaces.md`) requires no authentication and exposes
+([`docs/12_debug_interfaces.md`](12_debug_interfaces.md)) requires no authentication and exposes
 significant device internals. This project did not investigate the broader
 security implications (e.g., whether malicious host software could abuse
 this without special privileges, whether SteamVR itself ever triggers it,

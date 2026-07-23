@@ -39,7 +39,7 @@ the start and adhered to throughout:
   documentation or forum speculation.
 - If firmware extraction turns out to be impossible, determine exactly why
   and document the limiting factor (this did not end up being necessary —
-  extraction was trivial; see `04_firmware_acquisition.md`).
+  extraction was trivial; see [`04_firmware_acquisition.md`](04_firmware_acquisition.md)).
 - Preserve dead ends. A technique that failed is still evidence, and
   prevents future re-investigation of the same false lead.
 
@@ -52,31 +52,31 @@ the order they were substantively pursued:
 1. **Prior-art and documentation research** — establishing what is publicly
    known about the Index Controller's hardware, the Lighthouse/Watchman
    protocol family, and prior community reverse-engineering work. See
-   `02_background.md`.
+   [`02_background.md`](02_background.md).
 2. **Firmware acquisition** — locating and extracting the firmware images
-   SteamVR ships for the controller. See `04_firmware_acquisition.md`.
+   SteamVR ships for the controller. See [`04_firmware_acquisition.md`](04_firmware_acquisition.md).
 3. **Static firmware analysis** — identifying the LED driver hardware and
    its firmware-side driver code via string analysis, before any
-   disassembly tooling was available. See `08_lp5562_driver.md`.
+   disassembly tooling was available. See [`08_lp5562_driver.md`](08_lp5562_driver.md).
 4. **Live USB HID protocol investigation** — mapping every HID report on
    every interface the controller exposes, which led to discovering an
-   undocumented debug interface. See `12_debug_interfaces.md`,
-   `11_hid_commands.md`.
+   undocumented debug interface. See [`12_debug_interfaces.md`](12_debug_interfaces.md),
+   [`11_hid_commands.md`](11_hid_commands.md).
 5. **Firmware container format reverse engineering** — driven by a failed
    patch attempt against Valve's own update tool, which forced a full
-   disassembly of that tool's validation logic. See `05_firmware_layout.md`.
+   disassembly of that tool's validation logic. See [`05_firmware_layout.md`](05_firmware_layout.md).
 6. **Live firmware patching and flashing** — building and successfully
    flashing modified firmware to real hardware, first as a same-version
    safety test, then as an actual behavioral patch. See
-   `13_experiments.md`, `15_firmware_patching.md`.
+   [`13_experiments.md`](13_experiments.md), [`15_firmware_patching.md`](15_firmware_patching.md).
 7. **Deep ARM/Thumb-2 disassembly of the LED subsystem**, first by hand and
    with lightweight tools, later with a properly installed Ghidra headless
    toolchain, to trace the exact code path from "LED color request" down to
-   the hardware register writes. See `06_firmware_symbols.md`,
-   `07_led_architecture.md`.
+   the hardware register writes. See [`06_firmware_symbols.md`](06_firmware_symbols.md),
+   [`07_led_architecture.md`](07_led_architecture.md).
 8. **RTOS task-boundary tracing**, the current open frontier — attempting to
    connect the power-management task's charging-state logic to the LED
-   policy's color decision. See `16_charging_led_research.md`.
+   policy's color decision. See [`16_charging_led_research.md`](16_charging_led_research.md).
 
 ## What "done" looks like for this project
 
@@ -88,4 +88,4 @@ selectively (e.g., preserving charging-status indication while disabling the
 LED during normal use) rather than only as a blunt "always on" / "always
 off" toggle.
 
-See `18_future_work.md` for the prioritized list of what remains.
+See [`18_future_work.md`](18_future_work.md) for the prioritized list of what remains.

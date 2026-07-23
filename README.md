@@ -13,7 +13,7 @@ found, how it was found, what failed, and what remains open.
 
 ## Project status
 
-**Active / paused between sessions.** See `docs/18_future_work.md` for the
+**Active / paused between sessions.** See [`docs/18_future_work.md`](docs/18_future_work.md) for the
 current task queue and `research/daily_logs/` for the most recent session log.
 
 ## Core question and answer
@@ -25,7 +25,7 @@ current task queue and `research/daily_logs/` for the most recent session log.
 hardware: a modified firmware image, built and flashed entirely through
 software (no debugger, no chip-off, no soldering), changed the controller's
 real-world visible LED behavior (verified by a human observer watching the
-physical device). See `docs/13_experiments.md` (Experiments 6 and 7) for the
+physical device). See [`docs/13_experiments.md`](docs/13_experiments.md) (Experiments 6 and 7) for the
 full evidence trail.
 
 The remaining 3% is not about *whether* software control is possible — that
@@ -34,21 +34,21 @@ blanket "LED always off" patch is proven and repeatable. A *selective* patch
 (e.g. "off only while not charging, but preserve the charging/charged
 indicator colors") is understood at the architecture level but not yet fully
 traced to the exact code that decides those colors. See
-`docs/16_charging_led_research.md`.
+[`docs/16_charging_led_research.md`](docs/16_charging_led_research.md).
 
 ## Major discoveries (with confidence levels)
 
 | # | Finding | Confidence | Reference |
 |---|---|---|---|
-| 1 | Firmware is unencrypted, zlib-compressed with a self-describing footer | 100% (reproduced on 5 files) | `docs/04_firmware_acquisition.md`, `docs/05_firmware_layout.md` |
-| 2 | LED hardware is a TI LP5562 I2C RGBW driver, not a simple GPIO LED | 95% | `docs/08_lp5562_driver.md` |
-| 3 | An undocumented USB HID "Debug" interface exists and is trivially unlockable | 100% (reproduced live) | `docs/12_debug_interfaces.md` |
-| 4 | The live debug shell can read (not write) firmware config values | 100% (reproduced live) | `docs/11_hid_commands.md` |
-| 5 | Valve's own firmware update tool can be driven from Linux to push arbitrary modified firmware to the real device | 100% (reproduced live, 4 successful flashes) | `docs/10_protocol_analysis.md`, `docs/13_experiments.md` |
-| 6 | The `.fw` container's trailing CRC field is a self-referential CRC-32, fully reverse engineered | 100% (verified against all known-good firmware files) | `docs/05_firmware_layout.md` |
-| 7 | The compiled-in config defaults table structure (9-byte packed entries) is fully mapped | 100% (verified against 30 live values) | `docs/06_firmware_symbols.md` |
-| 8 | The low-level LED PWM-write function was located, patched, and the patch visually confirmed to turn the LED off on real hardware | 100% (reproduced live) | `docs/15_firmware_patching.md`, `docs/13_experiments.md` Experiment 7 |
-| 9 | The state-to-color policy decision (which color for "charging" vs "ready") is **not yet located** — it lives beyond an RTOS task boundary (shared state, not a direct call) | Hypothesis, ~70% | `docs/16_charging_led_research.md` |
+| 1 | Firmware is unencrypted, zlib-compressed with a self-describing footer | 100% (reproduced on 5 files) | [`docs/04_firmware_acquisition.md`](docs/04_firmware_acquisition.md), [`docs/05_firmware_layout.md`](docs/05_firmware_layout.md) |
+| 2 | LED hardware is a TI LP5562 I2C RGBW driver, not a simple GPIO LED | 95% | [`docs/08_lp5562_driver.md`](docs/08_lp5562_driver.md) |
+| 3 | An undocumented USB HID "Debug" interface exists and is trivially unlockable | 100% (reproduced live) | [`docs/12_debug_interfaces.md`](docs/12_debug_interfaces.md) |
+| 4 | The live debug shell can read (not write) firmware config values | 100% (reproduced live) | [`docs/11_hid_commands.md`](docs/11_hid_commands.md) |
+| 5 | Valve's own firmware update tool can be driven from Linux to push arbitrary modified firmware to the real device | 100% (reproduced live, 4 successful flashes) | [`docs/10_protocol_analysis.md`](docs/10_protocol_analysis.md), [`docs/13_experiments.md`](docs/13_experiments.md) |
+| 6 | The `.fw` container's trailing CRC field is a self-referential CRC-32, fully reverse engineered | 100% (verified against all known-good firmware files) | [`docs/05_firmware_layout.md`](docs/05_firmware_layout.md) |
+| 7 | The compiled-in config defaults table structure (9-byte packed entries) is fully mapped | 100% (verified against 30 live values) | [`docs/06_firmware_symbols.md`](docs/06_firmware_symbols.md) |
+| 8 | The low-level LED PWM-write function was located, patched, and the patch visually confirmed to turn the LED off on real hardware | 100% (reproduced live) | [`docs/15_firmware_patching.md`](docs/15_firmware_patching.md), [`docs/13_experiments.md`](docs/13_experiments.md) Experiment 7 |
+| 9 | The state-to-color policy decision (which color for "charging" vs "ready") is **not yet located** — it lives beyond an RTOS task boundary (shared state, not a direct call) | Hypothesis, ~70% | [`docs/16_charging_led_research.md`](docs/16_charging_led_research.md) |
 
 ## What didn't work
 
@@ -57,7 +57,7 @@ footnote — reproducing a failed approach costs real time, and the whole
 point of this archive is to save the next person that time. Every failed
 technique below is written up in full (what was tried, why it seemed
 reasonable, why it failed, what it ruled out) in
-**`docs/14_failed_attempts.md`**. Headline entries:
+**[`docs/14_failed_attempts.md`](docs/14_failed_attempts.md)**. Headline entries:
 
 - The debug shell's `config` command cannot write values through any
   syntax tried — real time was spent confirming this negative result
@@ -65,7 +65,7 @@ reasonable, why it failed, what it ruled out) in
 - Three independent, individually-reliable methods (Ghidra's reference
   manager, an exhaustive brute-force call-site search, a raw stored-pointer
   search) all failed to find who calls the LED policy's per-state entry
-  points — see `docs/16_charging_led_research.md` for why this consistent
+  points — see [`docs/16_charging_led_research.md`](docs/16_charging_led_research.md) for why this consistent
   failure is itself meaningful evidence, not just "didn't look hard
   enough."
 - An early manual (pre-Ghidra) disassembly pass misattributed an indirect
@@ -77,7 +77,7 @@ reasonable, why it failed, what it ruled out) in
   findable configuration backup file in this project's testing, despite
   two full successful firmware updates.
 
-None of this is hidden in a "known issues" appendix — `docs/14_failed_attempts.md`
+None of this is hidden in a "known issues" appendix — [`docs/14_failed_attempts.md`](docs/14_failed_attempts.md)
 is linked from the repository layout below like every other document, and
 individual dead ends are cross-referenced from whichever `docs/` page they
 relate to, so you hit them in context, not just in one long list.
@@ -88,7 +88,7 @@ relate to, so you hit them in context, not just in one long list.
   HWID `0x110e0009`.
 - **Firmware analyzed:** `indexcontroller_app_20230902_v1693638519.fw`
   (2023-09-02, git `2c3286c3`) as the primary target, cross-checked against
-  four other historical firmware builds. See `hashes/firmware_hashes.txt` for
+  four other historical firmware builds. See [`hashes/firmware_hashes.txt`](hashes/firmware_hashes.txt) for
   exact versions and SHA-256 sums.
 - **SteamVR version used:** build ID `23791826` (Steam depot manifest
   timestamp 2026-06-17).
@@ -102,6 +102,10 @@ relate to, so you hit them in context, not just in one long list.
 ```
 README.md                      you are here
 LICENSE                        MIT license for original work (see scope note inside)
+SECURITY.md                     the one security-relevant finding, and why it wasn't formally disclosed
+CONTRIBUTING.md                 how to contribute: verify claims, continue open research, report dead ends
+GLOSSARY.md                     terms, acronyms, and project-specific shorthand used throughout
+requirements.txt                Python dependencies for scripts/
 
 docs/                           the primary technical reference, read in order
   01_project_overview.md          what this project is and why it exists
@@ -138,6 +142,7 @@ captures/                       (reserved for future USB traffic captures)
 images/                         (reserved for hardware photographs — none taken yet)
 firmware/                       NOT firmware binaries — instructions for obtaining them
 hashes/                         SHA-256 manifests for every firmware artifact referenced
+tests/                          automated tests for reusable logic (synthetic data only)
 ```
 
 ## Quick start
@@ -145,17 +150,28 @@ hashes/                         SHA-256 manifests for every firmware artifact re
 **To reproduce the read-only findings** (HID descriptor mapping, debug shell
 access, config readout) you need: a wired Valve Index Controller, Linux,
 Python 3, and SteamVR installed (for the firmware files and the official
-update tool). Start with `docs/04_firmware_acquisition.md` and
-`docs/12_debug_interfaces.md`.
+update tool). Start with [`docs/04_firmware_acquisition.md`](docs/04_firmware_acquisition.md) and
+[`docs/12_debug_interfaces.md`](docs/12_debug_interfaces.md).
 
 **To reproduce the firmware patching work** you additionally need root access
-(via `sudo` or `pkexec`) and are advised to read `docs/17_safety.md` in full
+(via `sudo` or `pkexec`) and are advised to read [`docs/17_safety.md`](docs/17_safety.md) in full
 before writing anything to real hardware.
 
 **To continue the open research** (selective charging-color patch), install
-Ghidra per `tools/ghidra_setup.md` and start from
-`docs/16_charging_led_research.md`, which documents exactly how far the trace
+Ghidra per [`tools/ghidra_setup.md`](tools/ghidra_setup.md) and start from
+[`docs/16_charging_led_research.md`](docs/16_charging_led_research.md), which documents exactly how far the trace
 got and where it stopped.
+
+**To run the automated tests** (synthetic-data-only checks of a few
+reusable, self-contained pieces of logic — the `.fw` footer CRC formula,
+the config-table struct layout, and the Thumb-2 `BL` instruction encoder),
+install the dependencies in [`requirements.txt`](requirements.txt) and run:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+See [`tests/README.md`](tests/README.md) for what's covered and why.
 
 ## Current capabilities (proven, reproducible)
 
@@ -173,22 +189,22 @@ got and where it stopped.
 
 - The blanket "LED off" patch disables **all** LED indication, including the
   charging/charged status colors that most users would want to keep. See
-  `docs/16_charging_led_research.md`.
+  [`docs/16_charging_led_research.md`](docs/16_charging_led_research.md).
 - The exact mechanism connecting the power-management RTOS task's charging
   state to the LED policy's color choice has not been located.
 - Only one controller unit and one firmware build have been extensively
   tested live. Behavior on other hardware revisions or firmware versions is
-  unverified (see `docs/17_safety.md` for version-compatibility notes).
+  unverified (see [`docs/17_safety.md`](docs/17_safety.md) for version-compatibility notes).
 - No photographs or video of the physical LED behavior have been captured
   yet; findings rely on the human tester's direct visual observation,
-  recorded as commentary in `docs/13_experiments.md`.
+  recorded as commentary in [`docs/13_experiments.md`](docs/13_experiments.md).
 - This repository does not (and per its legal notice, must not) include any
   Valve firmware binary. Anyone reproducing this work needs their own
   legitimate SteamVR installation.
 
 ## Warnings
 
-Read `docs/17_safety.md` before attempting any of this on your own hardware.
+Read [`docs/17_safety.md`](docs/17_safety.md) before attempting any of this on your own hardware.
 In summary:
 
 - Flashing modified firmware to a real controller carries a real, if small,
@@ -221,11 +237,11 @@ research, 2026-07-22 through 2026-07-23 and ongoing).
 Built on prior public reverse-engineering work on Valve's Lighthouse/Watchman
 protocol family, most notably the `nairol/LighthouseRedox` project, which
 established HID report ID conventions for the original Vive wand controller
-that informed early hypotheses in this project (see `docs/02_background.md`).
+that informed early hypotheses in this project (see [`docs/02_background.md`](docs/02_background.md)).
 
 ## Future goals
 
-See `docs/18_future_work.md` for the full prioritized roadmap. Headline
+See [`docs/18_future_work.md`](docs/18_future_work.md) for the full prioritized roadmap. Headline
 items:
 
 1. Locate the shared-state connection between the power-management RTOS task

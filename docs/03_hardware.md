@@ -3,11 +3,11 @@
 ## Scope of this document
 
 This document covers the hardware inventory of the test unit as established
-through firmware analysis and the live debug shell (`docs/12_debug_interfaces.md`).
+through firmware analysis and the live debug shell ([`docs/12_debug_interfaces.md`](12_debug_interfaces.md)).
 No physical teardown, PCB photography, or chip decapping was performed during
 this project — all hardware identification below is derived from software
 evidence. Photographic documentation is listed as future work
-(`18_future_work.md`).
+([`18_future_work.md`](18_future_work.md)).
 
 ## Test unit identity
 
@@ -24,9 +24,9 @@ evidence. Photographic documentation is listed as future work
 ### Main MCU: Nordic nRF52840
 
 **Confidence: 95%.** Identified via public teardown (background research,
-`02_background.md`) and consistent with all firmware evidence gathered:
+[`02_background.md`](02_background.md)) and consistent with all firmware evidence gathered:
 ARM Cortex-M4F Thumb-2 instruction encoding throughout the decompiled
-firmware (see `06_firmware_symbols.md`), a vector-table structure consistent
+firmware (see [`06_firmware_symbols.md`](06_firmware_symbols.md)), a vector-table structure consistent
 with a Cortex-M reset/exception model, and RAM addresses in the
 `0x20000000`–`0x20040000` range matching the nRF52840's 256 KB SRAM. Not
 independently confirmed by reading a chip marking directly (no teardown
@@ -50,8 +50,8 @@ evidence**, not inference from a teardown:
   simple on/off or fixed-color operation. This is the hardware basis for the
   project's core conclusion that software-driven arbitrary color control is
   architecturally possible, not merely a firmware policy restriction.
-- The firmware's low-level LED-write function (`docs/08_lp5562_driver.md`,
-  `docs/06_firmware_symbols.md`) writes to hardware register offsets `0x10`,
+- The firmware's low-level LED-write function ([`docs/08_lp5562_driver.md`](08_lp5562_driver.md),
+  [`docs/06_firmware_symbols.md`](06_firmware_symbols.md)) writes to hardware register offsets `0x10`,
   `0x30`, `0x50` for three of the four channels — spacing and register
   ranges consistent with the LP5562's real PWM/current-control register map
   (exact register-by-register confirmation against the LP5562 datasheet is
@@ -62,7 +62,7 @@ evidence**, not inference from a teardown:
 **Confidence: 80% (unconfirmed by firmware string evidence, carried over
 from the background teardown research).** Believed to handle optical/IR
 sensor timing for Lighthouse base-station tracking. The live `flash_info`
-debug shell command (`docs/11_hid_commands.md`) confirms a dedicated
+debug shell command ([`docs/11_hid_commands.md`](11_hid_commands.md)) confirms a dedicated
 `ice40_image` flash partition (`0x00044000`–`0x00057fff`, 78219 of 81920
 bytes used) containing a genuine FPGA bitstream — the presence and size of
 this partition is 100% confirmed; the specific FPGA part number is not
@@ -74,7 +74,7 @@ source.
 **Confidence: 80% (carried over from background teardown research, not
 independently re-confirmed).** A 32 Mbit (4 MB) SPI NOR flash chip. The live
 `flash_info` output confirms a flash layout with multiple named partitions
-totaling well under 4 MB actually used (see `05_firmware_layout.md` for the
+totaling well under 4 MB actually used (see [`05_firmware_layout.md`](05_firmware_layout.md) for the
 full partition table), consistent with — but not uniquely proving — a chip
 of this size.
 
@@ -83,7 +83,7 @@ of this size.
 **Confidence: 100%, directly confirmed live.** The `battery` debug shell
 command reports `Fuel gauge: bq27421` and returns live telemetry (state of
 charge, voltage, temperature, charger state) consistent with a real fuel
-gauge IC on the I2C bus. See `docs/11_hid_commands.md` for the full command
+gauge IC on the I2C bus. See [`docs/11_hid_commands.md`](11_hid_commands.md) for the full command
 output.
 
 ## Unconfirmed / not investigated
@@ -93,7 +93,7 @@ output.
   PCB (single RGBW LED package vs. discrete LEDs).
 - Any secondary/simple GPIO-driven LED distinct from the LP5562-driven
   status LED, despite the firmware clearly supporting a `led_driver_gpio.c`
-  code path (see `07_led_architecture.md`) — it is not established whether
+  code path (see [`07_led_architecture.md`](07_led_architecture.md)) — it is not established whether
   this test unit's hardware actually populates a GPIO LED, or whether that
   driver path is dead/vestigial code for this particular board revision.
 - Whether other Index Controller hardware revisions (left vs. right
@@ -101,5 +101,5 @@ output.
 
 ## Flash layout (from live `flash_info`)
 
-See `docs/05_firmware_layout.md` for the complete, annotated partition table
+See [`docs/05_firmware_layout.md`](05_firmware_layout.md) for the complete, annotated partition table
 and its significance to firmware patching.

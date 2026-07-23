@@ -1,7 +1,7 @@
 # 11 — Debug Shell Commands
 
 All commands below are issued over the undocumented USB HID "Debug"
-interface (`docs/12_debug_interfaces.md`). All were tested live against the
+interface ([`docs/12_debug_interfaces.md`](12_debug_interfaces.md)). All were tested live against the
 project's test controller (serial `LHR-XXXXXXXX`). Full raw transcripts are
 preserved in `research/captures/`.
 
@@ -18,7 +18,7 @@ radio, controller, trackpad, fingers
 ```
 
 Discovered by sending `help\n` after correctly reverse-engineering the wire
-framing (see `docs/12_debug_interfaces.md` for the framing bug and fix).
+framing (see [`docs/12_debug_interfaces.md`](12_debug_interfaces.md) for the framing bug and fix).
 **Confidence: 100%**, reproduced live, response captured in full.
 
 ## `info`
@@ -43,10 +43,10 @@ FPGA ver: 0x21a 538
 **Purpose:** dumps all 46 live compiled-in configuration values.
 **Tested:** yes, extensively — this command's output was the anchor used to
 reverse engineer the config defaults table structure
-(`docs/06_firmware_symbols.md` §6.2).
+([`docs/06_firmware_symbols.md`](06_firmware_symbols.md) §6.2).
 
 Sample (full 46-entry dump preserved in
-`research/captures/debug_shell_config_syntax.txt`):
+[`research/captures/debug_shell_config_syntax.txt`](../research/captures/debug_shell_config_syntax.txt)):
 
 ```
 Config: 1508 of 3072 bytes
@@ -65,7 +65,7 @@ set <key> <value>`, `config get <key>`, and several other argument
 combinations were tried; all silently produced the same full read-only dump
 with no error and no value change, unlike commands with genuine argument
 validation (see `set_gpio_level` below, which correctly reports an error on
-bad input). See `docs/14_failed_attempts.md` for the full list of syntaxes
+bad input). See [`docs/14_failed_attempts.md`](14_failed_attempts.md) for the full list of syntaxes
 tried. **Confidence the shell cannot write config: 90%** — it is possible an
 undiscovered syntax exists, but the behavior (silent no-op rather than an
 error) is consistent with there being no write path through this specific
@@ -75,7 +75,7 @@ command at all.
 
 **Purpose:** reports the six-region code/RAM layout and the full named
 flash partition table.
-**Tested:** yes. Output reproduced verbatim in `docs/05_firmware_layout.md`
+**Tested:** yes. Output reproduced verbatim in [`docs/05_firmware_layout.md`](05_firmware_layout.md)
 §5.3. This command was the source of the `0x412000` vs. flash-offset
 `0x012000` discrepancy discussed there.
 
@@ -87,7 +87,7 @@ lower confidence.
 
 **Purpose:** live battery/charging telemetry.
 **Tested:** yes, used specifically to attempt correlating charging state
-with LED color (`docs/16_charging_led_research.md`).
+with LED color ([`docs/16_charging_led_research.md`](16_charging_led_research.md)).
 
 Sample output:
 
@@ -104,7 +104,7 @@ DM Code: 97 (0x0061)
 ```
 
 **Confidence: 100%** for the telemetry values shown; this directly confirms
-a live `bq27421` fuel gauge (`docs/03_hardware.md`) and a `charge term`
+a live `bq27421` fuel gauge ([`docs/03_hardware.md`](03_hardware.md)) and a `charge term`
 charging state at the time of capture.
 
 ## `set_gpio_level` / `get_gpio_level` / `set_gpio_dir`
@@ -113,7 +113,7 @@ charging state at the time of capture.
 **Tested:** usage text only (`<addr> (eg PA21)`, `<level> (high/low or h/l)`)
 — not used to actually toggle a pin during this project, since the FPGA
 "led" GPIO pin name found in firmware strings (a GPIO pin-name table entry,
-`docs/06_firmware_symbols.md`) was not conclusively mapped to a specific
+[`docs/06_firmware_symbols.md`](06_firmware_symbols.md)) was not conclusively mapped to a specific
 `PAxx`/`PBxx` address. **Confidence: 100%** these commands exist and have
 correct-syntax validation (confirmed by triggering a proper `"Argument
 Input error"` on bad input, which is notably *different* behavior from
@@ -131,11 +131,11 @@ All tested with no arguments to observe default/usage behavior. Summary:
 | `haptics` | Returned empty response with no arguments | 100% (behavior observed; purpose beyond that not explored) |
 | `controller` | Live VRC state dump: buttons, trigger, fsr, trackpad, thumbstick, fingers values | 100% |
 | `trackpad`, `fingers` | Not separately explored beyond appearing in `controller`'s combined output | n/a |
-| `watchman` | `watchman suspend` / `watchman resume` both work, produce `Watchman: suspend` / `Watchman: resume (Controller)` responses; used in an attempt to trigger a state-change log (unsuccessful) — see `docs/14_failed_attempts.md` | 100% (commands work) |
+| `watchman` | `watchman suspend` / `watchman resume` both work, produce `Watchman: suspend` / `Watchman: resume (Controller)` responses; used in an attempt to trigger a state-change log (unsuccessful) — see [`docs/14_failed_attempts.md`](14_failed_attempts.md) | 100% (commands work) |
 | `imu` | Reports `running 250 Hz 2000 dps 8 G` | 100% |
 | `lep` | Lighthouse Edge Processor stats — output captured but not analyzed in depth | 100% (command exists), low confidence on interpretation |
 | `schedule` | Usage: `disable`/`enable`/`test`/`apply <seconds> <32b sensor mask, base16>` — not exercised beyond usage text | n/a |
-| `tasks` | Returns the 12-entry RTOS task list: `shell, IDLE, sync on beam, watchman, vrc, sync on beam bg, wdt, Tmr Svc, battery, imu, fpga, power` | 100% — this list is the basis for believing an `vrc` task (not directly confirmed) handles LED policy, discussed in `docs/16_charging_led_research.md` |
+| `tasks` | Returns the 12-entry RTOS task list: `shell, IDLE, sync on beam, watchman, vrc, sync on beam bg, wdt, Tmr Svc, battery, imu, fpga, power` | 100% — this list is the basis for believing an `vrc` task (not directly confirmed) handles LED policy, discussed in [`docs/16_charging_led_research.md`](16_charging_led_research.md) |
 | `route` | Returns `MSG route: USB` | 100%, purpose (whether this affects async log streaming) not conclusively determined |
 | `queue` | Returned empty with no arguments | 100% (behavior observed), purpose not explored further |
 
@@ -160,7 +160,7 @@ user_data all          information the header and all entries
 These commands were investigated as a possible alternative, lower-risk path
 to writing config values (as opposed to a full firmware reflash) but were
 not pursued to conclusion within this project's time budget. **This is
-flagged as a priority item in `docs/18_future_work.md`** — if
+flagged as a priority item in [`docs/18_future_work.md`](18_future_work.md)** — if
 `led_driver_current_*` (or the actual LED policy state) turns out to live in
 the separate `stored_conf`/`data_store` flash partitions rather than the
 compiled-in application defaults table, `user_data`/`user_flash` may be the

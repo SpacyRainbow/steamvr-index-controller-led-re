@@ -1,0 +1,14 @@
+# Python dependencies for scripts/ in this repository.
+#
+# Everything else in scripts/ uses only the Python 3 standard library
+# (zlib, struct, os, fcntl, select, sys) -- no installation needed beyond
+# a working Python 3 interpreter for those.
+#
+# capstone is required only by scripts/disasm_config.py (lightweight
+# Thumb-2 disassembly, used for early/manual work -- see
+# tools/ghidra_setup.md for the more thorough Ghidra-based alternative
+# used for deeper analysis).
+#
+# Install with: pip install -r requirements.txt
+
+capstone>=5.0

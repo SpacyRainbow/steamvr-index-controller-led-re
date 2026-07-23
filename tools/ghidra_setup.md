@@ -5,7 +5,7 @@ mode.
 
 ## Why no-root install was needed
 
-Same constraint as radare2 (`radare2_setup.md`): no passwordless `sudo` in
+Same constraint as radare2 ([`radare2_setup.md`](radare2_setup.md)): no passwordless `sudo` in
 this environment. The same `dnf download` (no root required) + `rpm2cpio`
 extraction approach was used.
 
@@ -87,7 +87,7 @@ Expected: the tool prints its own version banner and a usage/help message
 
 Import and fully auto-analyze a decompressed firmware image as a raw
 binary, ARM Cortex-M4, little-endian, based at the empirically-determined
-load address (`../docs/05_firmware_layout.md` §5.4):
+load address ([`../docs/05_firmware_layout.md`](../docs/05_firmware_layout.md) §5.4):
 
 ```bash
 GHIDRA=~/ghidra_root/usr/lib64/ghidra
@@ -136,14 +136,14 @@ process, not just tooling.
   inside a function's body. Use `getFunctionContaining(address)` when you
   are not certain the address is an exact entry point (this distinction
   caused real confusion early in the Layer-3 tracing work — see
-  `../docs/14_failed_attempts.md`).
+  [`../docs/14_failed_attempts.md`](../docs/14_failed_attempts.md)).
 - Large regions of this specific firmware were **not** included in any
   function Ghidra's auto-analysis recognized, despite containing valid,
   disassemblable Thumb-2 code (confirmed by manually walking through them
   instruction-by-instruction). `getReferencesTo()` on addresses inside
   these regions can return zero results even when a real code reference
-  exists — see `../docs/14_failed_attempts.md` for the specific
-  recurring cases and `../docs/18_future_work.md` Priority 6 for the
+  exists — see [`../docs/14_failed_attempts.md`](../docs/14_failed_attempts.md) for the specific
+  recurring cases and [`../docs/18_future_work.md`](../docs/18_future_work.md) Priority 6 for the
   suggestion to investigate this Ghidra-specific limitation further.
 
 ## Cleanup / project location note
